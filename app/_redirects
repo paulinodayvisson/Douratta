@@ -1,7 +1,0 @@
-# Faz qualquer link /cardapio/ALGUMACOISA carregar o mesmo cardapio.html
-# (que então lê o ID na própria URL e mostra a tela de acompanhamento).
-# Use este arquivo se você hospeda no Netlify ou Cloudflare Pages —
-# coloque na RAIZ do site (mesma pasta do cardapio.html), sem extensão,
-# com o nome exato "_redirects".
-
-/cardapio/*  /cardapio.html  200
