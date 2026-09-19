@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -105,9 +106,6 @@ input,select,textarea{font-family:inherit;}
 .check-waiting{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:24px 10px;opacity:.6;font-size:0.82rem;}
 .check-waiting .material-symbols-outlined{font-size:32px;}
 .check-progress{text-align:right;font-size:0.72rem;font-weight:700;opacity:.55;margin-top:6px;}
-.qr-motoboy{display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 6px 6px;text-align:center;}
-.qr-motoboy img{border-radius:12px;box-shadow:0 4px 14px rgba(33,26,15,0.08);}
-.qr-motoboy-txt{font-size:0.78rem;opacity:.7;display:flex;align-items:center;gap:5px;max-width:260px;}
 
 /* ---------- pontuação ---------- */
 table{width:100%;border-collapse:collapse;background:var(--bianco);border-radius:14px;overflow:hidden;}
@@ -115,6 +113,19 @@ table th,table td{padding:11px 14px;text-align:left;font-size:0.85rem;border-bot
 table th{background:var(--carvao);color:var(--avorio);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.03em;}
 table td.mono{font-family:var(--font-mono);}
 .pontos-num{font-weight:700;color:var(--dourado-dark);}
+
+/* ---------- configurações / status da loja ---------- */
+.config-card{background:var(--bianco);border-radius:18px;padding:20px;box-shadow:0 4px 16px rgba(33,26,15,0.07);max-width:420px;}
+.config-card h3{font-family:var(--font-display);font-size:1.1rem;margin-bottom:4px;}
+.config-card .sub{font-size:0.8rem;opacity:.65;}
+.loja-toggle-row{display:flex;align-items:center;justify-content:center;gap:14px;margin-top:18px;}
+.loja-toggle-label{font-size:0.85rem;font-weight:700;opacity:.4;transition:opacity .2s;}
+.loja-toggle-label.ativo{opacity:1;}
+.loja-toggle{width:56px;height:32px;border-radius:99px;background:var(--vermelho);position:relative;flex-shrink:0;transition:background .2s;}
+.loja-toggle.on{background:var(--verde);}
+.loja-toggle .loja-toggle-knob{position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 2px 6px rgba(0,0,0,0.25);transition:left .2s;}
+.loja-toggle.on .loja-toggle-knob{left:27px;}
+.loja-toggle[disabled]{opacity:.6;cursor:not-allowed;}
 
 /* ---------- cardápio ---------- */
 .cat-block{margin-bottom:22px;}
@@ -128,6 +139,13 @@ table td.mono{font-family:var(--font-mono);}
 .btn-salvar-prod{background:var(--dourado);color:var(--carvao);padding:8px 14px;border-radius:9px;font-weight:700;font-size:0.75rem;}
 
 .empty-note{text-align:center;padding:40px 10px;opacity:.5;font-size:0.88rem;}
+
+/* ---------- botão "fazer pedido para outra pessoa" ---------- */
+.acoes-topo{display:flex;justify-content:flex-end;margin-bottom:16px;}
+.btn-outra-pessoa{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--dourado);color:var(--carvao);padding:12px 18px;border-radius:12px;font-weight:800;font-size:0.82rem;letter-spacing:.02em;text-decoration:none;box-shadow:0 3px 10px rgba(198,135,10,0.25);}
+.btn-outra-pessoa:hover{background:#fbbf3c;}
+.btn-outra-pessoa:focus-visible{outline:3px solid var(--carvao);outline-offset:2px;}
+@media(max-width:600px){.acoes-topo{justify-content:stretch;}.btn-outra-pessoa{width:100%;}}
 .loading-note{text-align:center;padding:30px;opacity:.5;font-size:0.88rem;}
 
 /* ---------- impressão térmica automática do pedido ---------- */
@@ -168,6 +186,9 @@ table td.mono{font-family:var(--font-mono);}
 .recibo .r-item-det{font-size:10.5px;padding-left:2.4mm;opacity:.85;word-wrap:break-word;}
 .recibo .r-total{display:flex;justify-content:space-between;font-size:15px;font-weight:800;margin:.8mm 0;}
 .recibo .r-check{font-size:11.5px;margin:1.2mm 0;}
+.recibo .r-qr{text-align:center;margin:1.5mm 0 .5mm;}
+.recibo .r-qr img{width:34mm;height:34mm;display:block;margin:0 auto;padding:1.5mm;background:#fff;image-rendering:pixelated;}
+.recibo .r-qr-txt{font-size:10.5px;font-weight:700;margin-top:1mm;line-height:1.25;}
 .recibo .r-foot{text-align:center;font-size:10px;opacity:.7;margin-top:3mm;}
 </style>
 </head>
@@ -210,12 +231,23 @@ table td.mono{font-family:var(--font-mono);}
       <span class="material-symbols-outlined">restaurant_menu</span>
       Cardápio
     </button>
+    <button class="tab-btn" data-tab="configuracoes" onclick="mudarAba('configuracoes')">
+      <span class="material-symbols-outlined">settings</span>
+      Configurações
+    </button>
   </div>
   <div class="content">
+    <div class="acoes-topo">
+      <a class="btn-outra-pessoa" id="btnOutraPessoa" href="https://douratta.com.br/" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined">add_shopping_cart</span>
+        FAZER PEDIDO PARA OUTRA PESSOA
+      </a>
+    </div>
     <div class="tab-panel active" id="tabPedidos"><div class="loading-note">Carregando pedidos…</div></div>
     <div class="tab-panel" id="tabChecklist"><div class="loading-note">Carregando checklist…</div></div>
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
+    <div class="tab-panel" id="tabConfiguracoes"><div class="loading-note">Carregando configurações…</div></div>
   </div>
 </div>
 
@@ -226,6 +258,13 @@ table td.mono{font-family:var(--font-mono);}
 const API_URL = 'https://script.google.com/macros/s/AKfycbz8qL33hAbb17yvAN8OvbSYN4xaH6NVdtLwZ65g_0IWz3pMyGI6p2wyRNDnb-cWVZec/exec';
 const LS_KEY = 'douratta_painel_senha_v1';
 const POLL_MS = 15000; // intervalo de checagem de novos pedidos
+// Endereço do cardápio da Douratta que o botão "FAZER PEDIDO PARA OUTRA
+// PESSOA" abre (em outra aba, pra o painel continuar recebendo pedidos).
+// CONFIRA/TROQUE aqui se o cardápio ficar em outro endereço.
+const CARDAPIO_URL = 'https://douratta.com.br/';
+// Página que o entregador abre ao escanear o QR Code impresso no papel.
+// O ID real do pedido entra em ?pedido=. NÃO altere a base.
+const INFOPEDIDO_URL_BASE = 'https://douratta.com.br/app/infopedido';
 
 let senhaPainel = '';
 let abaAtual = 'pedidos';
@@ -355,18 +394,39 @@ function reciboHtmlPedido_(p){
   if(troco!=null) h += `<div class="r-row"><b>TROCO</b><b>${formatBRL(troco)}</b></div>`;
   if(p.codigoIndicacao) h += `<div class="r-row"><span>Indicação</span><span>${escaparHtml_(p.codigoIndicacao)}</span></div>`;
   h += `<hr class="r-solid">`;
-  h += `<div class="r-titulo r-center">PRODUÇÃO</div>`;
-  ['PAGAMENTO CONFIRMADO','EM PREPARO','PRONTO','SAIU PARA ENTREGA'].forEach(txt=>{
-    h += `<div class="r-check">&#9744; ${txt}</div>`;
-  });
+  // QR Code do pedido: o entregador escaneia direto no papel e abre
+  // https://douratta.com.br/app/infopedido?pedido=ID_DO_PEDIDO
+  const qrSrc = qrImagemSrc_(linkInfoPedido_(p.id));
+  h += `<div class="r-qr"><img src="${escaparHtml_(qrSrc)}" alt="QR Code do pedido"><div class="r-qr-txt">ENTREGADOR: escaneie para ver rota, contato e Pix</div></div>`;
   h += `<div class="r-foot">Obrigado pela preferência!<br>douratta.com.br</div>`;
   return h;
+}
+// Gera o QR Code no próprio navegador (biblioteca qrcodejs, já carregada
+// no <head>) e devolve como data URI — assim funciona na hora, sem
+// depender de internet na hora de imprimir. Se a biblioteca não tiver
+// carregado, cai pra um serviço externo de QR como plano B.
+function qrImagemSrc_(texto){
+  try{
+    if(typeof QRCode !== 'undefined'){
+      const box = document.createElement('div');
+      new QRCode(box, { text: texto, width: 264, height: 264, correctLevel: QRCode.CorrectLevel.M });
+      const cv = box.querySelector('canvas');
+      if(cv){ const url = cv.toDataURL('image/png'); if(url && url.length > 100) return url; }
+    }
+  }catch(e){}
+  return 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&margin=0&data=' + encodeURIComponent(texto);
 }
 function imprimirPedido(p){
   if(!p){ alert('Não encontrei os dados desse pedido pra imprimir.'); return; }
   const area = document.getElementById('areaImpressaoPedido');
   area.innerHTML = `<div class="recibo">${reciboHtmlPedido_(p)}</div>`;
-  setTimeout(()=>{ window.print(); }, 150);
+  // espera as imagens do recibo (QR Code) terminarem de carregar antes de
+  // abrir a impressão — no máximo 2s, pra nunca travar a impressão.
+  const imgs = Array.from(area.querySelectorAll('img'));
+  const prontas = Promise.all(imgs.map(im=> im.complete ? Promise.resolve() : new Promise(res=>{ im.onload = im.onerror = res; })));
+  Promise.race([prontas, new Promise(res=>setTimeout(res, 2000))]).then(()=>{
+    setTimeout(()=>{ window.print(); }, 150);
+  });
 }
 function reimprimirPedido(id){
   imprimirPedido(pedidosCache.find(pd=>pd.id===id));
@@ -392,6 +452,18 @@ async function apiPost(acao, dados){
     body: JSON.stringify(Object.assign({acao, senhaPainel}, dados))
   });
   return resp.json();
+}
+
+/* ---------- fazer pedido para outra pessoa (painel → cardápio) ---------- */
+// O botão "FAZER PEDIDO PARA OUTRA PESSOA" é um link (<a target="_blank">)
+// que abre o cardápio da Douratta em OUTRA aba, pra o painel continuar
+// recebendo pedidos. O atendente monta o pedido da pessoa que ligou/está
+// no balcão pelo fluxo normal do cardápio (mesmo Apps Script/planilha);
+// ele aparece aqui no painel como qualquer outro pedido novo. O endereço
+// do link vem da constante CARDAPIO_URL (definida no topo do <script>).
+function configurarBotaoOutraPessoa_(){
+  const btn = document.getElementById('btnOutraPessoa');
+  if(btn) btn.href = CARDAPIO_URL;
 }
 
 /* ---------- login ---------- */
@@ -430,6 +502,7 @@ function mudarAba(nome){
   if(nome==='pontuacao') carregarPontuacao();
   if(nome==='cardapio') carregarCardapio();
   if(nome==='checklist') renderChecklist();
+  if(nome==='configuracoes') carregarConfiguracoes();
 }
 
 /* ---------- ciclo de atualização (pedidos) ---------- */
@@ -542,11 +615,11 @@ function carregarChecklistState_(){
 function salvarChecklistState_(){
   try{ localStorage.setItem('douratta_checklist_state_v1', JSON.stringify(checklistState)); }catch(e){}
 }
-// Link da página que o motoboy vê ao escanear o QR Code — itens do
-// pedido + QR Code Pix pra cobrar a entrega. TROQUE aqui se o domínio
-// mudar (mesma regra do link de acompanhamento do cliente).
+// Link da página que o entregador vê ao escanear o QR Code do papel —
+// dados do pedido, rota, contato e QR Code Pix pra cobrar a entrega.
+// Formato: https://douratta.com.br/app/infopedido?pedido=ID_DO_PEDIDO
 function linkInfoPedido_(id){
-  return `https://douratta.paulinodayvisson.workers.dev/app/infopedido/${id}`;
+  return `${INFOPEDIDO_URL_BASE}?pedido=${encodeURIComponent(String(id==null?'':id).trim())}`;
 }
 function marcarChecklistItem(pedidoId, idx, checked){
   checklistState[pedidoId] = checklistState[pedidoId] || {};
@@ -624,12 +697,6 @@ function renderChecklist(){
       }
     } else if(p.status === 'aceito'){
       corpoHtml = `<div class="check-waiting"><span class="material-symbols-outlined">outdoor_grill</span>Toque em "Iniciar preparo" pra ver o checklist de ingredientes.</div>`;
-    } else if(p.status === 'em_rota'){
-      const linkInfo = linkInfoPedido_(p.id);
-      corpoHtml = `<div class="qr-motoboy">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&margin=6&data=${encodeURIComponent(linkInfo)}" alt="QR Code do pedido pro motoboy" width="170" height="170">
-        <div class="qr-motoboy-txt"><span class="material-symbols-outlined" style="font-size:16px;">two_wheeler</span> O motoboy escaneia esse QR pra ver os itens do pedido e o Pix pra cobrar a entrega.</div>
-      </div>`;
     }
 
     const botaoHtml = info.proximaAcao
@@ -724,8 +791,46 @@ async function salvarProduto(id, tipoPizza, btn){
   }
 }
 
+/* ---------- ABA CONFIGURAÇÕES ---------- */
+let configCache = { aberto: true, horarioFuncionamento: '' };
+async function carregarConfiguracoes(){
+  const el = document.getElementById('tabConfiguracoes');
+  el.innerHTML = '<div class="loading-note">Carregando…</div>';
+  const data = await apiPost('obterConfiguracoes', {}).catch(()=>({ok:false}));
+  if(!data.ok){ el.innerHTML = `<div class="empty-note">${data.erro||'Não foi possível carregar agora.'}</div>`; return; }
+  configCache = { aberto: !!data.aberto, horarioFuncionamento: data.horarioFuncionamento || '' };
+  renderConfiguracoes();
+}
+function renderConfiguracoes(){
+  const el = document.getElementById('tabConfiguracoes');
+  const aberta = configCache.aberto;
+  el.innerHTML = `<div class="config-card">
+      <h3>Status da loja</h3>
+      <p class="sub">Controla se o botão de Cardápio aparece pro cliente no site. Quando fechada, o cliente vê a mensagem de horário no lugar.</p>
+      <div class="loja-toggle-row">
+        <span class="loja-toggle-label ${!aberta?'ativo':''}">Fechada</span>
+        <button class="loja-toggle ${aberta?'on':''}" id="btnToggleLoja" onclick="alternarStatusLoja()" role="switch" aria-checked="${aberta}" aria-label="Abrir ou fechar a loja">
+          <span class="loja-toggle-knob"></span>
+        </button>
+        <span class="loja-toggle-label ${aberta?'ativo':''}">Aberta</span>
+      </div>
+      ${configCache.horarioFuncionamento ? `<p class="sub" style="margin-top:16px;">Horário mostrado quando fechada: <b>${configCache.horarioFuncionamento}</b></p>` : ''}
+    </div>`;
+}
+async function alternarStatusLoja(){
+  const btn = document.getElementById('btnToggleLoja');
+  const novoValor = !configCache.aberto;
+  if(btn) btn.disabled = true;
+  const data = await apiPost('definirStatusLoja', { valor: novoValor ? 'SIM' : 'NAO' }).catch(()=>({ok:false}));
+  if(btn) btn.disabled = false;
+  if(!data.ok){ alert(data.erro || 'Não foi possível atualizar agora.'); return; }
+  configCache.aberto = typeof data.aberto === 'boolean' ? data.aberto : novoValor;
+  renderConfiguracoes();
+}
+
 /* ---------- início ---------- */
 (function iniciar(){
+  configurarBotaoOutraPessoa_();
   let salva = '';
   try{ salva = localStorage.getItem(LS_KEY) || ''; }catch(e){}
   if(salva){
