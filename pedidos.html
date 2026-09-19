@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -62,8 +63,14 @@ button{font-family:inherit;border:none;cursor:pointer;}
 .track-step .txt{font-weight:700;font-size:0.92rem;}
 .btn-recebi{width:100%;margin-top:14px;background:var(--verde);color:#fff;padding:12px;border-radius:12px;font-weight:700;font-size:0.88rem;display:flex;align-items:center;justify-content:center;gap:6px;}
 .btn-recebi:disabled{opacity:.6;cursor:default;}
-.thanks{margin-top:14px;background:var(--verde-pale);border-radius:14px;padding:14px;font-size:0.85rem;line-height:1.5;}
-.thanks b{display:block;font-family:var(--font-display);font-size:1.05rem;margin-bottom:2px;}
+.confirm-hint{font-size:0.78rem;opacity:.7;margin-top:14px;text-align:center;line-height:1.4;}
+.confirm-hint + .btn-recebi{margin-top:8px;}
+.thanks-box{text-align:center;padding:10px 4px 4px;}
+.thanks-box .ico-big{width:68px;height:68px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.thanks-box .ico-big svg{width:34px;height:34px;}
+.thanks-box h2{justify-content:center;font-size:1.4rem;margin-bottom:8px;}
+.thanks-box p{font-size:0.9rem;line-height:1.55;opacity:.8;}
+.thanks-box p + p{margin-top:8px;}
 .msg-inline{font-size:0.78rem;color:var(--vermelho);margin-top:8px;min-height:1em;}
 .btn-retry{display:block;margin:0 auto 6px;background:var(--dourado);color:var(--carvao);padding:11px 22px;border-radius:12px;font-weight:800;font-size:0.85rem;}
 .voltar{display:block;text-align:center;margin-top:6px;font-size:0.85rem;font-weight:700;color:var(--carvao-soft);text-decoration:underline;}
@@ -233,8 +240,19 @@ function mostrarMensagem_(texto, comRetry){
 
 function statusHtml_(p){
   const st = TRACK_ORDEM_.indexOf(p.status) > -1 ? p.status : 'novo';
+
+  // Pedido entregue: só esta parte da tela muda — vira o agradecimento.
+  // (Nome, itens, forma de pagamento e Pix continuam aparecendo embaixo.)
+  if(st === 'entregue'){
+    return `<div class="thanks-box">
+      <div class="ico-big">${TRACK_ICONES_.entregue}</div>
+      <h2>Bom apetite!</h2>
+      <p>Seu pedido foi entregue. Muito obrigado por escolher a Douratta Pizzaria!</p>
+      <p>Esperamos que você aproveite cada pedaço. Volte sempre — vai ser um prazer te atender de novo.</p>
+    </div>`;
+  }
+
   const idxAtual = TRACK_ORDEM_.indexOf(st);
-  const entregue = st === 'entregue';
   const emEspera = st === 'novo';
   const passos = [
     `<div class="track-step ${emEspera?'current':'done'}">
@@ -244,20 +262,24 @@ function statusHtml_(p){
   ];
   TRACK_ETAPAS_.forEach(et=>{
     const idxEtapa = TRACK_ORDEM_.indexOf(et.chave);
-    const isDone = entregue ? true : idxAtual > idxEtapa;
-    const isCurrent = !entregue && et.chave === st;
+    const isDone = idxAtual > idxEtapa;
+    const isCurrent = et.chave === st;
     passos.push(`<div class="track-step ${isDone?'done':''} ${isCurrent?'current':''}">
       <div class="ico" data-spin="${isCurrent && et.chave==='em_preparo' ? '1':'0'}">${TRACK_ICONES_[et.chave]}</div>
       <div class="txt">${et.label}</div>
     </div>`);
   });
+  // Botão do cliente: aparece quando o pedido saiu para entrega (é a única etapa em que
+  // o Apps Script aceita a confirmação — "confirmarEntregaCliente").
+  const botao = st === 'em_rota' ? `
+    <div class="confirm-hint">Recebeu seu pedido? Confirme aqui.</div>
+    <button class="btn-recebi" onclick="confirmarEntrega_(this)">
+      <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> Confirmar entrega
+    </button>` : '';
   return `
     <h2><span class="material-symbols-outlined">local_shipping</span> Status do pedido</h2>
     <div class="track-steps">${passos.join('')}</div>
-    ${st==='em_rota' ? `<button class="btn-recebi" onclick="confirmarEntrega_(this)">
-      <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> Já recebi meu pedido
-    </button>` : ''}
-    ${entregue ? `<div class="thanks"><b>Bom apetite!</b>Seu pedido foi entregue. Obrigado por escolher a Douratta Pizzaria — esperamos que aproveite!</div>` : ''}
+    ${botao}
     <div class="msg-inline" id="msgStatus" role="status"></div>`;
 }
 
