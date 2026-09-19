@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -2799,7 +2800,34 @@ function onNeighborhoodChange(nome){
   renderForm();
 }
 
+// Quando o bairro vem PRÉ-PREENCHIDO (perfil salvo no aparelho ou preenchido
+// pelo telefone), ninguém passa pelo onchange do <select>, então o frete
+// nunca era calculado (delivery ficava "idle") e o botão de enviar ficava
+// desabilitado. Aqui o bairro já preenchido é tratado como escolhido:
+// acha o bairro na lista atual, aplica a taxa e libera o envio. Se o bairro
+// salvo não existir mais na planilha, limpa pra pessoa escolher de novo
+// (senão o <select> mostraria outro bairro sem o sistema saber).
+function syncDeliveryFromNeighborhood_(){
+  const nome = customerData.neighborhood;
+  if(!nome){
+    if(delivery.status==='ok') delivery = { status:'idle', fee:null, reason:'' };
+    return;
+  }
+  if(!NEIGHBORHOODS.length) return; // lista ainda não carregou: não mexe
+  const alvo = String(nome).trim().toLowerCase();
+  const nb = NEIGHBORHOODS.find(n => n.nome === nome)
+          || NEIGHBORHOODS.find(n => String(n.nome).trim().toLowerCase() === alvo);
+  if(nb){
+    customerData.neighborhood = nb.nome;
+    delivery = { status:'ok', fee: Number(nb.taxa) || 0, reason: nb.distanciaKm ? `~${nb.distanciaKm} km` : '' };
+  } else {
+    customerData.neighborhood = '';
+    delivery = { status:'idle', fee:null, reason:'' };
+  }
+}
+
 function renderForm(){
+  syncDeliveryFromNeighborhood_();
   const sub = cartSubtotal();
   const total = Math.max(0, sub + (delivery.status==='ok' ? delivery.fee : 0) - CONFIG.discount - coinsDiscountReais());
 
@@ -2941,6 +2969,7 @@ async function sendOrder(){
     });
     return;
   }
+  syncDeliveryFromNeighborhood_();
   if(!customerData.neighborhood || delivery.status!=='ok'){
     showToast('Selecione o bairro pra calcular a taxa de entrega');
     const el = document.getElementById('fNeigh');
