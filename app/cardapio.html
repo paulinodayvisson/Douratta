@@ -1069,7 +1069,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbz8qL33hAbb17yvAN8OvbSY
 // Link de acompanhamento mandado no WhatsApp: página única /pedidos, que
 // lê o parâmetro ?id= (sem Cloudflare Worker e sem /pedidos/ID). Só é
 // chamado DEPOIS que o Apps Script devolveu o id do pedido.
-const LINK_ACOMPANHAMENTO_BASE = 'https://douratta.com.br/app/infopedido';
+const LINK_ACOMPANHAMENTO_BASE = 'https://douratta.com.br/app/pedidos';
 function linkAcompanhamento_(id){
   return LINK_ACOMPANHAMENTO_BASE + '?id=' + encodeURIComponent(String(id));
 }
