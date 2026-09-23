@@ -3,547 +3,373 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex,nofollow">
-<meta name="referrer" content="no-referrer">
-<meta name="theme-color" content="#211A0F">
-<title>Pedido — Douratta Pizzaria</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Acompanhar meu pedido — Douratta Pizzaria</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
 <style>
 :root{
-  --dourado:#F9B31A; --dourado-dark:#C6870A; --dourado-pale:#FDECC4;
-  --vermelho:#D31A1B; --vermelho-dark:#9E1212; --vermelho-pale:#FBE3E3;
+  --dourado:#F9B31A; --dourado-dark:#C6870A;
+  --vermelho:#D31A1B; --verde:#2E8B45; --verde-pale:#E4F3E8;
   --avorio:#FFFBF2; --avorio-dark:#F1E7D2;
   --carvao:#211A0F; --carvao-soft:#3A2E18;
-  --bianco:#FFFFFF; --linha:rgba(33,26,15,0.10);
-  --verde:#2E8B45; --verde-dark:#1F6B32; --verde-pale:#E4F3E8;
+  --linha:rgba(33,26,15,0.10);
   --font-display:'Fraunces', Georgia, serif;
-  --font-body:'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono:'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --font-body:'Manrope', sans-serif;
+  --font-mono:'IBM Plex Mono', monospace;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{-webkit-text-size-adjust:100%;}
-body{font-family:var(--font-body);background:var(--avorio-dark);color:var(--carvao);min-height:100vh;-webkit-font-smoothing:antialiased;line-height:1.4;padding-bottom:env(safe-area-inset-bottom);}
-button{font-family:inherit;border:none;background:none;cursor:pointer;color:inherit;}
-a{color:inherit;}
-:focus-visible{outline:3px solid var(--dourado);outline-offset:2px;}
-.app{max-width:540px;margin:0 auto;min-height:100vh;}
+body{font-family:var(--font-body);background:var(--avorio-dark);color:var(--carvao);min-height:100vh;-webkit-font-smoothing:antialiased;}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 500,'GRAD' 0,'opsz' 22;font-size:20px;vertical-align:middle;}
+button{font-family:inherit;border:none;cursor:pointer;}
+.wrap{max-width:440px;margin:0 auto;padding:22px 16px 50px;}
+.top{text-align:center;margin-bottom:16px;}
+.top h1{font-family:var(--font-display);font-size:1.3rem;font-weight:700;}
+.top .sub{font-size:0.8rem;opacity:.6;margin-top:2px;}
+.card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 6px 22px rgba(33,26,15,0.07);margin-bottom:16px;}
+.card h2{font-family:var(--font-display);font-size:1.02rem;margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.linha{display:flex;justify-content:space-between;gap:10px;font-size:0.85rem;padding:6px 0;border-bottom:1px dashed var(--linha);}
+.linha:last-child{border-bottom:none;}
+.item{margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--linha);}
+.item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.item .nome{font-weight:800;font-size:0.92rem;margin-bottom:3px;}
+.item .det{font-size:0.78rem;opacity:.75;margin-top:2px;}
+.item .preco{font-weight:700;color:var(--vermelho);font-size:0.85rem;margin-top:4px;}
+.total-row{display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:6px;border-top:2px solid var(--carvao);}
+.total-row .valor{font-family:var(--font-display);font-weight:800;font-size:1.3rem;color:var(--vermelho);}
+.pix-card{text-align:center;}
+.pix-card img{width:190px;height:190px;border-radius:12px;margin:6px auto 12px;display:block;}
+.pix-chave{font-family:var(--font-mono);font-size:0.85rem;background:var(--avorio);border-radius:10px;padding:10px 12px;word-break:break-all;margin-bottom:10px;}
+.btn-copiar{width:100%;background:var(--verde);color:#fff;padding:12px;border-radius:12px;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:6px;}
+.aviso{font-size:0.74rem;opacity:.6;margin-top:10px;line-height:1.4;}
+.loading-note,.empty-note{text-align:center;padding:40px 16px;opacity:.6;font-size:0.88rem;}
+.status-tag{display:inline-block;background:var(--dourado);color:var(--carvao);font-size:0.7rem;font-weight:800;padding:3px 10px;border-radius:99px;margin-bottom:10px;word-break:break-all;}
 
-/* ---------- topo escuro: identificação + cliente + ações ---------- */
-.topo{background:var(--carvao);color:var(--avorio);padding:calc(14px + env(safe-area-inset-top)) 18px 20px;border-radius:0 0 24px 24px;}
-.topo-linha{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
-.marca{font-family:var(--font-display);font-weight:700;font-size:1.15rem;color:var(--dourado);letter-spacing:.01em;}
-.pid{font-family:var(--font-mono);font-weight:600;font-size:0.74rem;opacity:.75;word-break:break-all;text-align:right;}
-.data{font-size:0.78rem;opacity:.6;margin-top:2px;}
-.cli-nome{font-family:var(--font-display);font-weight:600;font-size:1.9rem;line-height:1.15;margin-top:18px;overflow-wrap:anywhere;}
-.cli-tel{font-family:var(--font-mono);font-weight:500;font-size:0.95rem;opacity:.85;margin-top:4px;}
-.end{font-style:normal;margin-top:14px;padding:12px 14px;background:rgba(255,251,242,0.08);border-radius:14px;font-size:1.02rem;font-weight:600;line-height:1.45;overflow-wrap:anywhere;}
-.end .end-linha{display:block;}
-.end .end-ref{display:block;margin-top:6px;padding-top:6px;border-top:1px dashed rgba(255,251,242,0.25);font-weight:500;font-size:0.9rem;color:var(--dourado-pale);}
-.end.vazio{font-weight:500;opacity:.75;}
-.acoes{display:flex;gap:10px;margin-top:16px;}
-.btn-acao{flex:1;min-height:58px;border-radius:14px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:800;font-size:0.95rem;letter-spacing:.04em;text-decoration:none;text-align:center;transition:transform .08s ease;}
-.btn-acao:active{transform:scale(.98);}
-.btn-acao svg{width:22px;height:22px;flex-shrink:0;}
-.btn-rota{background:var(--dourado);color:var(--carvao);}
-.btn-contato{background:transparent;color:var(--avorio);box-shadow:inset 0 0 0 2px rgba(255,251,242,0.55);}
-.btn-acao[disabled],.btn-acao[aria-disabled="true"]{opacity:.38;cursor:not-allowed;pointer-events:none;}
-.acao-aviso{font-size:0.74rem;opacity:.65;margin-top:8px;}
-
-/* ---------- cartões ---------- */
-main{padding:16px 14px 40px;display:flex;flex-direction:column;gap:14px;}
-.card{background:var(--bianco);border-radius:18px;padding:18px 16px;box-shadow:0 4px 16px rgba(33,26,15,0.07);}
-.card h2{font-family:var(--font-display);font-weight:600;font-size:1.15rem;line-height:1.2;}
-.resumo-itens{font-size:0.8rem;opacity:.65;margin-top:3px;}
-.itens{list-style:none;margin-top:12px;}
-.item{padding:12px 0;border-top:1px dashed var(--linha);}
-.item:first-child{border-top:none;padding-top:2px;}
-.item-topo{display:flex;align-items:baseline;gap:8px;}
-.item-qty{font-family:var(--font-mono);font-weight:600;font-size:1rem;background:var(--dourado-pale);color:var(--dourado-dark);border-radius:8px;padding:1px 8px;flex-shrink:0;}
-.item-nome{font-weight:800;font-size:1.02rem;flex:1;overflow-wrap:anywhere;}
-.item-valor{font-weight:700;font-size:0.9rem;white-space:nowrap;opacity:.8;}
-.item-corpo{margin:7px 0 0 0;display:flex;flex-direction:column;gap:6px;}
-.sabor{padding-left:10px;border-left:3px solid var(--dourado);}
-.sabor-nome{font-weight:700;font-size:0.95rem;}
-.sabor-fr{font-family:var(--font-mono);font-size:0.72rem;font-weight:600;background:var(--avorio-dark);border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:1px;}
-.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
-.chip{font-size:0.76rem;font-weight:700;border-radius:7px;padding:2px 8px;}
-.chip.sem{background:var(--vermelho-pale);color:var(--vermelho-dark);}
-.chip.com{background:var(--verde-pale);color:var(--verde-dark);}
-.chip.neutro{background:var(--avorio-dark);color:var(--carvao-soft);}
-.chip.moedas{background:var(--dourado-pale);color:var(--dourado-dark);}
-.info-linha{font-size:0.88rem;font-weight:600;}
-.obs{background:var(--dourado-pale);border-radius:10px;padding:8px 10px;font-size:0.88rem;font-weight:600;overflow-wrap:anywhere;}
-.vazio-nota{font-size:0.9rem;opacity:.6;margin-top:10px;}
-
-.linhas{margin-top:10px;}
-.linha{display:flex;justify-content:space-between;gap:12px;padding:7px 0;font-size:0.95rem;}
-.linha .rot{opacity:.75;}
-.linha .val{font-weight:700;white-space:nowrap;}
-.linha.desc .val{color:var(--verde-dark);}
-.linha.total{margin-top:6px;padding-top:12px;border-top:2px solid var(--carvao);align-items:baseline;}
-.linha.total .rot{font-family:var(--font-display);font-weight:600;font-size:1.05rem;opacity:1;}
-.linha.total .val{font-family:var(--font-display);font-weight:700;font-size:1.7rem;color:var(--vermelho);}
-.pagto{margin-top:12px;padding:11px 12px;background:var(--avorio);border-radius:12px;font-size:0.92rem;}
-.pagto b{font-weight:800;}
-.pagto .troco{margin-top:4px;font-weight:800;color:var(--vermelho-dark);}
-
-/* ---------- Pix ---------- */
-.card.pix{border:2px solid var(--dourado);text-align:center;padding:20px 16px 18px;}
-.card.pix h2{margin-bottom:2px;}
-.pix-valor{font-family:var(--font-display);font-weight:700;font-size:2.4rem;line-height:1.1;color:var(--carvao);margin-top:6px;}
-.pix-sub{font-size:0.8rem;opacity:.65;margin-top:2px;}
-.pix-qr{width:min(78vw,290px);aspect-ratio:1/1;margin:16px auto 4px;background:#fff;border-radius:14px;padding:12px;box-shadow:0 0 0 1px var(--linha);display:flex;align-items:center;justify-content:center;}
-.pix-qr img{width:100%;height:100%;display:block;image-rendering:pixelated;}
-.btn-copiar{margin-top:14px;width:100%;min-height:52px;border-radius:13px;background:var(--carvao);color:var(--avorio);font-weight:800;font-size:0.9rem;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-copiar.ok{background:var(--verde);}
-.btn-copiar svg{width:19px;height:19px;}
-.pix-rec{font-size:0.76rem;opacity:.6;margin-top:10px;}
-.aviso{background:var(--dourado-pale);color:var(--carvao);border-radius:12px;padding:12px 14px;font-size:0.88rem;font-weight:600;text-align:left;margin-top:12px;}
-
-/* ---------- estados: carregando / erro ---------- */
-.estado{background:var(--bianco);border-radius:18px;padding:28px 20px;text-align:center;box-shadow:0 4px 16px rgba(33,26,15,0.07);}
-.estado h2{font-family:var(--font-display);font-size:1.3rem;margin-bottom:8px;}
-.estado p{font-size:0.92rem;opacity:.75;overflow-wrap:anywhere;}
-.estado .id-mono{font-family:var(--font-mono);font-weight:600;opacity:1;margin-top:10px;font-size:0.85rem;}
-.estado .btn-tentar{margin-top:18px;min-height:50px;padding:0 26px;border-radius:13px;background:var(--vermelho);color:#fff;font-weight:800;}
-.spinner{width:34px;height:34px;border:4px solid var(--avorio-dark);border-top-color:var(--vermelho);border-radius:50%;margin:0 auto 14px;animation:girar .7s linear infinite;}
-@keyframes girar{to{transform:rotate(360deg);}}
-@media (prefers-reduced-motion: reduce){.spinner{animation-duration:2s;}.btn-acao{transition:none;}}
-
-/* ---------- CONTATO: painel inferior ---------- */
-.fundo{position:fixed;inset:0;background:rgba(33,26,15,0.55);display:none;align-items:flex-end;justify-content:center;z-index:100;}
-.fundo.aberto{display:flex;}
-.painel{width:100%;max-width:540px;background:var(--bianco);border-radius:22px 22px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(33,26,15,0.25);}
-.painel h3{font-family:var(--font-display);font-weight:600;font-size:1.15rem;}
-.painel .painel-tel{font-family:var(--font-mono);font-size:0.85rem;opacity:.65;margin:2px 0 14px;}
-.opcao{display:flex;align-items:center;gap:14px;width:100%;min-height:62px;padding:0 16px;border-radius:14px;font-weight:800;font-size:1rem;text-decoration:none;margin-bottom:10px;text-align:left;}
-.opcao svg{width:26px;height:26px;flex-shrink:0;}
-.opcao.wpp{background:var(--verde);color:#fff;}
-.opcao.lig{background:var(--carvao);color:var(--avorio);}
-.opcao[aria-disabled="true"]{opacity:.4;pointer-events:none;}
-.opcao-cancelar{width:100%;min-height:48px;border-radius:12px;font-weight:700;color:var(--carvao-soft);background:var(--avorio-dark);}
+/* ---- linha do tempo de status (mesmas etapas e ícones do acompanhamento do cardápio) ---- */
+.track-steps{display:flex;flex-direction:column;gap:10px;margin-top:4px;}
+.track-step{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:var(--avorio);opacity:.4;transition:opacity .3s;}
+.track-step.done{opacity:1;}
+.track-step.current{opacity:1;background:#fff;box-shadow:0 6px 20px rgba(211,26,27,0.18);animation:trackPulso 1.6s ease-in-out infinite;}
+@keyframes trackPulso{0%,100%{box-shadow:0 6px 20px rgba(211,26,27,0.18);}50%{box-shadow:0 6px 26px rgba(211,26,27,0.38);}}
+.track-step .ico{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--avorio-dark);color:var(--vermelho);}
+.track-step.done .ico{background:var(--verde);color:#fff;}
+.track-step.current .ico{background:var(--vermelho);color:#fff;}
+.track-step .ico svg{width:16px;height:16px;}
+.track-step.current .ico svg{animation:trackGirar 1.4s linear infinite;}
+.track-step.current .ico[data-spin="0"] svg{animation:none;}
+@keyframes trackGirar{to{transform:rotate(360deg);}}
+.track-step .txt{font-weight:700;font-size:0.92rem;}
+.btn-recebi{width:100%;margin-top:14px;background:var(--verde);color:#fff;padding:12px;border-radius:12px;font-weight:700;font-size:0.88rem;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-recebi:disabled{opacity:.6;cursor:default;}
+.confirm-hint{font-size:0.78rem;opacity:.7;margin-top:14px;text-align:center;line-height:1.4;}
+.confirm-hint + .btn-recebi{margin-top:8px;}
+.thanks-box{text-align:center;padding:10px 4px 4px;}
+.thanks-box .ico-big{width:68px;height:68px;border-radius:50%;background:var(--verde);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;}
+.thanks-box .ico-big svg{width:34px;height:34px;}
+.thanks-box h2{justify-content:center;font-size:1.4rem;margin-bottom:8px;}
+.thanks-box p{font-size:0.9rem;line-height:1.55;opacity:.8;}
+.thanks-box p + p{margin-top:8px;}
+.msg-inline{font-size:0.78rem;color:var(--vermelho);margin-top:8px;min-height:1em;}
+.btn-retry{display:block;margin:0 auto 6px;background:var(--dourado);color:var(--carvao);padding:11px 22px;border-radius:12px;font-weight:800;font-size:0.85rem;}
+.voltar{display:block;text-align:center;margin-top:6px;font-size:0.85rem;font-weight:700;color:var(--carvao-soft);text-decoration:underline;}
 </style>
 </head>
 <body>
-<noscript><div style="padding:24px;text-align:center;">Ative o JavaScript do navegador para ver este pedido.</div></noscript>
-
-<div class="app">
-  <header class="topo" id="topo">
-    <div class="topo-linha">
-      <span class="marca">Douratta</span>
-      <span class="pid" id="pid"></span>
-    </div>
-    <div class="data" id="dataPedido"></div>
-    <div id="topoCliente"></div>
-  </header>
-  <main id="conteudo">
-    <div class="estado" role="status"><div class="spinner" aria-hidden="true"></div><p>Buscando o pedido…</p></div>
-  </main>
-</div>
-
-<!-- CONTATO: escolher WhatsApp ou ligação -->
-<div class="fundo" id="fundoContato" aria-hidden="true">
-  <div class="painel" role="dialog" aria-modal="true" aria-labelledby="tituloContato">
-    <h3 id="tituloContato">Falar com o cliente</h3>
-    <div class="painel-tel" id="telContato"></div>
-    <a class="opcao wpp" id="opWpp" href="#" target="_blank" rel="noopener">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.5 3.5A11 11 0 0 0 2.7 17.2L2 22l4.9-1.3A11 11 0 1 0 20.5 3.5zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-3.1.8.8-3-.2-.3A9 9 0 1 1 12 20.5zm5-6.7c-.3-.1-1.6-.8-1.9-.9s-.5-.1-.6.1-.7.9-.9 1.1-.3.2-.6.1a7.3 7.3 0 0 1-3.6-3.1c-.3-.5.3-.5.8-1.5.1-.2 0-.3 0-.5l-.9-2.1c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.8 11.9 11.9 0 0 0 4.6 4.1c1.7.7 2.4.8 3.3.7a2.8 2.8 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.6-.3z"/></svg>
-      Conversar no WhatsApp
-    </a>
-    <a class="opcao lig" id="opLigar" href="#">
-      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>
-      Ligar
-    </a>
-    <button type="button" class="opcao-cancelar" id="btnFecharContato">Cancelar</button>
+<div class="wrap">
+  <div class="top">
+    <h1><span class="material-symbols-outlined" style="font-size:22px;vertical-align:-3px;">local_pizza</span> Douratta Pizzaria</h1>
+    <div class="sub">Acompanhe seu pedido</div>
   </div>
+  <div id="conteudo"><div class="loading-note">Carregando pedido…</div></div>
+  <a class="voltar" href="https://douratta.com.br/app/cardapio">Voltar ao cardápio</a>
 </div>
 
 <script>
 /* =========================================================
-   CONFIGURAÇÃO — mesma URL do Apps Script usada pelo painel e
-   pelo cardápio (Code.gs → implantação "App da Web").
+   /pedidos?id=ID_DO_PEDIDO — página única e dinâmica.
+   Lê o id da URL, pergunta ao Google Apps Script (ação "statusPedido")
+   e mostra só os dados daquele pedido. Nunca acessa a planilha direto.
    ========================================================= */
 const API_URL = 'https://script.google.com/macros/s/AKfycbz8qL33hAbb17yvAN8OvbSYN4xaH6NVdtLwZ65g_0IWz3pMyGI6p2wyRNDnb-cWVZec/exec';
-const TIMEOUT_MS = 25000;
-// Mesma regra de validação do Apps Script (normalizarIdPedido_).
-const ID_RE = /^[A-Za-z0-9_-]{3,40}$/;
+// O Pix (chave, nome do recebedor e QR Code) agora vem pronto do Apps Script,
+// que lê a chave da aba "Config" da planilha (mesmo padrão de /infopedido).
 
-/* ---------- helpers ---------- */
-const $ = id => document.getElementById(id);
-function esc(v){
-  return String(v == null ? '' : v)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-}
-const BRL = new Intl.NumberFormat('pt-BR', { style:'currency', currency:'BRL' });
-function brl(v){ return BRL.format(Number(v) || 0); }
-function num(v){ const n = Number(String(v == null ? '' : v).replace(',', '.')); return isFinite(n) ? n : 0; }
-function semAcento(s){ return String(s||'').normalize ? String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase() : String(s||'').toLowerCase(); }
-function plural(n, s, p){ return n + ' ' + (n === 1 ? s : p); }
+const POLL_MS = 8000;        // mesmo intervalo do acompanhamento dentro do cardápio
+const TIMEOUT_MS = 20000;    // Apps Script pode demorar na primeira chamada
+const ID_VALIDO_ = /^[A-Za-z0-9_-]{3,40}$/;   // mesmo formato que o Apps Script aceita
+const MSG_SEM_ID = 'Não foi possível identificar o pedido.';
+const MSG_NAO_ENCONTRADO = 'Pedido não encontrado.';
+const MSG_ERRO = 'Não foi possível consultar o pedido. Tente novamente.';
 
-function formatarDataHora(v){
-  const d = new Date(v);
-  if(!v || isNaN(d.getTime())) return '';
-  const opt = { timeZone:'America/Sao_Paulo' };
-  const dia = d.toLocaleDateString('pt-BR', Object.assign({ day:'2-digit', month:'2-digit', year:'numeric' }, opt));
-  const hora = d.toLocaleTimeString('pt-BR', Object.assign({ hour:'2-digit', minute:'2-digit' }, opt));
-  return dia + ' às ' + hora;
-}
+// Status do pedido = os que já existem no Apps Script/planilha (coluna "status"):
+// novo → aceito → em_preparo → finalizado → em_rota → entregue
+const TRACK_ORDEM_ = ['novo','aceito','em_preparo','finalizado','em_rota','entregue'];
+const TRACK_ETAPAS_ = [
+  { chave:'aceito',      label:'Pedido aceito' },
+  { chave:'em_preparo',  label:'Preparando seu pedido' },
+  { chave:'finalizado',  label:'Pedido finalizado' },
+  { chave:'em_rota',     label:'Saiu para entrega' },
+  { chave:'entregue',    label:'Entregue' }
+];
+const TRACK_ICONES_ = {
+  aceito: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>',
+  em_preparo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 2v6l4-2"/></svg>',
+  finalizado: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  em_rota: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="17" cy="18" r="2.5"/><path d="M2 18h2m2 0h7V8H6L2 12v6z"/><path d="M13 8h4l3 4v6h-2"/></svg>',
+  entregue: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  espera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>'
+};
 
-/* ---------- telefone ---------- */
-function soDigitos(v){ return String(v == null ? '' : v).replace(/\D/g,''); }
-// Devolve só dígitos com DDI 55 (ex.: 5531998512555) ou '' se não der pra montar.
-function telefoneInternacional(v){
-  let d = soDigitos(v);
-  if(d.length >= 11 && d.charAt(0) === '0') d = d.replace(/^0+/, '');
-  if(d.length >= 12 && d.length <= 13 && d.indexOf('55') === 0) return d;
-  if(d.length === 10 || d.length === 11) return '55' + d;
-  return '';
-}
-function telefoneBonito(v){
-  let d = soDigitos(v);
-  if(d.length >= 12 && d.indexOf('55') === 0) d = d.slice(2);
-  if(d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
-  if(d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
-  return String(v == null ? '' : v).trim();
-}
+let pedidoId_ = '';
+let renderizado_ = false;
+let statusRenderizado_ = null;
+let pollTimer_ = null;
+let consultando_ = false;
 
-/* ---------- endereço / rota ---------- */
-function linhasEndereco(txt){
-  return String(txt || '').split(/\n+/).map(s => s.trim()).filter(Boolean);
+function $(id){ return document.getElementById(id); }
+// Tudo que vem da planilha (nome, sabores, observações…) passa por aqui antes de ir pro HTML.
+function esc_(s){
+  return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-// Destino pro Google Maps, montado do endereço do próprio pedido: tira o
-// "Ref.:" (ponto de referência não ajuda a localizar no mapa) e o
-// prefixo "Bairro "; se o texto não citar a cidade (pedidos antigos),
-// acrescenta a cidade/UF de entrega vinda da Config da planilha.
-function destinoMapa(enderecoTexto, entrega){
-  const partes = linhasEndereco(enderecoTexto)
-    .filter(l => !/^ref\.?\s*:/i.test(l))
-    .map(l => l.replace(/^bairro\s+/i, ''));
-  if(!partes.length) return '';
-  let dest = partes.join(', ');
-  const cidade = (entrega && entrega.cidade) || '';
-  if(cidade && semAcento(dest).indexOf(semAcento(cidade)) === -1){
-    dest += ', ' + cidade + ((entrega && entrega.uf) ? ' - ' + entrega.uf : '');
-  }
-  return dest;
-}
-// Sem "origin": o Google Maps usa a localização atual do entregador
-// como partida e o endereço do cliente como destino.
-function linkRota(destino){
-  return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' + encodeURIComponent(destino);
-}
-
-/* ---------- ícones (SVG inline) ---------- */
-const ICO_ROTA = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21.7 11.3l-9-9a1 1 0 0 0-1.4 0l-9 9a1 1 0 0 0 0 1.4l9 9a1 1 0 0 0 1.4 0l9-9a1 1 0 0 0 0-1.4zM14 14v-3H10v3H8v-4a1 1 0 0 1 1-1h5V6l4 4-4 4z"/></svg>';
-const ICO_FONE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg>';
-const ICO_COPIAR = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z"/></svg>';
-const ICO_OK = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+function formatBRL(v){ return (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
 
 /* ---------- itens do pedido ---------- */
-function chipsHtml(removidos, adicionados){
-  const c = [];
-  (Array.isArray(removidos) ? removidos : []).forEach(r => c.push(`<span class="chip sem">SEM ${esc(r)}</span>`));
-  (Array.isArray(adicionados) ? adicionados : []).forEach(a => c.push(`<span class="chip com">+ ${esc(a)}</span>`));
-  return c.length ? `<div class="chips">${c.join('')}</div>` : '';
-}
-function itemHtml(it){
-  if(!it || typeof it !== 'object') return '';
-  const qty = Math.max(1, Math.round(num(it.qty)) || 1);
-  const tipo = String(it.tipo || '').toLowerCase();
-  const valor = num(it.valor);
-  const valorHtml = valor > 0 ? `<span class="item-valor">${brl(valor)}</span>` : '';
-  let titulo = '';
-  let corpo = '';
-
-  if(tipo === 'pizza'){
-    titulo = 'Pizza' + (it.tamanho ? ' ' + esc(it.tamanho) : '');
-    const sabores = Array.isArray(it.sabores) ? it.sabores : [];
-    if(sabores.length){
-      corpo += sabores.map(s => {
-        const fr = sabores.length > 1 ? `<span class="sabor-fr">1/${sabores.length}</span>` : '';
-        return `<div class="sabor">${fr}<span class="sabor-nome">${esc(s && s.nome || it.nome || 'Sabor')}</span>${chipsHtml(s && s.removidos, s && s.adicionados)}</div>`;
-      }).join('');
-    } else if(it.nome){
-      corpo += `<div class="sabor"><span class="sabor-nome">${esc(it.nome)}</span></div>`;
-    }
-  } else if(tipo === 'bebida'){
-    titulo = esc(it.nome || 'Bebida');
-    corpo += `<div class="chips"><span class="chip neutro">Bebida</span></div>`;
-  } else {
-    titulo = esc(it.nome || 'Item');
-    const ch = chipsHtml(it.removidos, it.adicionados);
-    if(ch) corpo += ch;
+function itemHtml_(it){
+  const qty = Number(it.qty)||0;
+  const preco = `<div class="preco">${it.resgatado?'Resgatado com moedas':formatBRL(it.valor)}</div>`;
+  if(it.tipo==='pizza'){
+    const sab = (it.sabores||[]).map(s=>esc_(s.nome)).join(' + ');
+    const detalhes = (it.sabores||[]).map(s=>{
+      const partes = [];
+      if(s.removidos&&s.removidos.length) partes.push('sem '+s.removidos.map(esc_).join(', '));
+      if(s.adicionados&&s.adicionados.length) partes.push('+ '+s.adicionados.map(esc_).join(', '));
+      return partes.length ? `${esc_(s.nome)} (${partes.join(' · ')})` : '';
+    }).filter(Boolean).join(' · ');
+    return `<div class="item">
+      <div class="nome">${qty}x Pizza ${esc_(it.tamanho||'')} — ${sab}</div>
+      ${it.borda?`<div class="det">Borda: ${esc_(it.borda)}</div>`:''}
+      ${detalhes?`<div class="det">${detalhes}</div>`:''}
+      ${it.obs?`<div class="det">Obs.: ${esc_(it.obs)}</div>`:''}
+      ${preco}
+    </div>`;
   }
-  if(it.borda) corpo += `<div class="info-linha">Borda: ${esc(it.borda)}</div>`;
-  if(it.obs) corpo += `<div class="obs">Obs.: ${esc(it.obs)}</div>`;
-  if(it.resgatado) corpo += `<div class="chips"><span class="chip moedas">Resgatado com moedas</span></div>`;
-
-  return `<li class="item">
-    <div class="item-topo"><span class="item-qty">${qty}×</span><span class="item-nome">${titulo}</span>${valorHtml}</div>
-    ${corpo ? `<div class="item-corpo">${corpo}</div>` : ''}
-  </li>`;
-}
-function resumoItens(itens){
-  let pizzas = 0, bebidas = 0, outros = 0;
-  itens.forEach(it => {
-    if(!it || typeof it !== 'object') return;
-    const q = Math.max(1, Math.round(num(it.qty)) || 1);
-    const t = String(it.tipo || '').toLowerCase();
-    if(t === 'pizza') pizzas += q; else if(t === 'bebida') bebidas += q; else outros += q;
-  });
-  const p = [];
-  if(pizzas) p.push(plural(pizzas, 'pizza', 'pizzas'));
-  if(bebidas) p.push(plural(bebidas, 'bebida', 'bebidas'));
-  if(outros) p.push(plural(outros, 'outro item', 'outros itens'));
-  return p.join(', ');
-}
-
-/* ---------- QR Code (gerado no navegador) ---------- */
-function qrDataUrl(texto, tamanho){
-  try{
-    if(typeof QRCode === 'undefined') return '';
-    const box = document.createElement('div');
-    new QRCode(box, { text: texto, width: tamanho, height: tamanho, correctLevel: QRCode.CorrectLevel.M });
-    const cv = box.querySelector('canvas');
-    return cv ? cv.toDataURL('image/png') : '';
-  }catch(e){ return ''; }
-}
-async function copiarTexto(txt){
-  try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
-  try{
-    const ta = document.createElement('textarea');
-    ta.value = txt; ta.setAttribute('readonly',''); ta.style.position = 'fixed'; ta.style.opacity = '0';
-    document.body.appendChild(ta); ta.select();
-    const ok = document.execCommand('copy');
-    document.body.removeChild(ta);
-    return ok;
-  }catch(e){ return false; }
-}
-
-/* ---------- estados ---------- */
-function mostrarEstado(titulo, texto, opts){
-  opts = opts || {};
-  $('topo').style.borderRadius = '0 0 24px 24px';
-  $('topoCliente').innerHTML = '';
-  $('dataPedido').textContent = '';
-  $('conteudo').innerHTML = `<div class="estado" role="alert">
-    <h2>${esc(titulo)}</h2>
-    <p>${esc(texto)}</p>
-    ${opts.id ? `<p class="id-mono">${esc(opts.id)}</p>` : ''}
-    ${opts.tentar ? `<button type="button" class="btn-tentar" id="btnTentar">Tentar de novo</button>` : ''}
+  return `<div class="item">
+    <div class="nome">${qty}x ${esc_(it.nome)}</div>
+    ${(it.removidos&&it.removidos.length)?`<div class="det">Sem: ${it.removidos.map(esc_).join(', ')}</div>`:''}
+    ${(it.adicionados&&it.adicionados.length)?`<div class="det">Com: ${it.adicionados.map(esc_).join(', ')}</div>`:''}
+    ${it.obs?`<div class="det">Obs.: ${esc_(it.obs)}</div>`:''}
+    ${preco}
   </div>`;
-  if(opts.tentar) $('btnTentar').addEventListener('click', carregar);
 }
 
-/* ---------- render do pedido ---------- */
-let estadoPagina = { pedido:null, entrega:null };
-function renderPedido(data){
-  const p = data.pedido || {};
-  const entrega = data.entrega || {};
-  estadoPagina = { pedido:p, entrega:entrega };
-  const itens = Array.isArray(p.itens) ? p.itens : [];
-
-  document.title = 'Pedido ' + (p.id || '') + ' — Douratta';
-  $('pid').textContent = p.id || '';
-  $('dataPedido').textContent = formatarDataHora(p.dataHora);
-
-  /* --- topo: cliente + endereço + ações --- */
-  const nome = String(p.nome || '').trim();
-  const telTxt = telefoneBonito(p.telefone);
-  const tel = telefoneInternacional(p.telefone);
-  const linhas = linhasEndereco(p.enderecoTexto);
-  const destino = destinoMapa(p.enderecoTexto, entrega);
-
-  let endHtml;
-  if(linhas.length){
-    const principais = linhas.filter(l => !/^ref\.?\s*:/i.test(l));
-    const refs = linhas.filter(l => /^ref\.?\s*:/i.test(l));
-    endHtml = `<address class="end">${principais.map(l => `<span class="end-linha">${esc(l)}</span>`).join('')}${refs.map(l => `<span class="end-ref">${esc(l)}</span>`).join('')}</address>`;
-  } else {
-    endHtml = `<address class="end vazio">Endereço não informado neste pedido.</address>`;
-  }
-  const rotaBtn = destino
-    ? `<a class="btn-acao btn-rota" id="btnRota" href="${esc(linkRota(destino))}" target="_blank" rel="noopener">${ICO_ROTA}VER ROTA</a>`
-    : `<button type="button" class="btn-acao btn-rota" disabled>${ICO_ROTA}VER ROTA</button>`;
-  const contatoBtn = soDigitos(p.telefone)
-    ? `<button type="button" class="btn-acao btn-contato" id="btnContato" aria-haspopup="dialog">${ICO_FONE}CONTATO</button>`
-    : `<button type="button" class="btn-acao btn-contato" disabled>${ICO_FONE}CONTATO</button>`;
-
-  $('topoCliente').innerHTML = `
-    <h1 class="cli-nome">${esc(nome || 'Cliente sem nome')}</h1>
-    ${telTxt ? `<div class="cli-tel">${esc(telTxt)}</div>` : ''}
-    ${endHtml}
-    <div class="acoes">${rotaBtn}${contatoBtn}</div>
-    ${!destino ? `<div class="acao-aviso">Sem endereço cadastrado: a rota não está disponível.</div>` : ''}
-    ${!soDigitos(p.telefone) ? `<div class="acao-aviso">Sem telefone cadastrado: o contato não está disponível.</div>` : ''}`;
-
-  if($('btnContato')) $('btnContato').addEventListener('click', () => abrirContato(nome, p.telefone, tel));
-
-  /* --- itens --- */
-  const resumo = resumoItens(itens);
-  const itensHtml = itens.map(itemHtml).join('');
-  const cardItens = `<section class="card" aria-labelledby="hItens">
-    <h2 id="hItens">Itens do pedido</h2>
-    ${resumo ? `<div class="resumo-itens">${esc(resumo)}</div>` : ''}
-    ${itensHtml ? `<ul class="itens">${itensHtml}</ul>` : `<p class="vazio-nota">Nenhum item registrado neste pedido.</p>`}
-  </section>`;
-
-  /* --- valores + pagamento --- */
-  const total = num(p.total);
-  const linhasVal = [];
-  linhasVal.push(`<div class="linha"><span class="rot">Subtotal</span><span class="val">${brl(p.subtotal)}</span></div>`);
-  if(num(p.frete) > 0) linhasVal.push(`<div class="linha"><span class="rot">Taxa de entrega</span><span class="val">${brl(p.frete)}</span></div>`);
-  if(num(p.desconto) > 0) linhasVal.push(`<div class="linha desc"><span class="rot">Desconto</span><span class="val">− ${brl(p.desconto)}</span></div>`);
-  if(num(p.moedasUsadas) > 0) linhasVal.push(`<div class="linha"><span class="rot">Moedas usadas</span><span class="val">${esc(Math.round(num(p.moedasUsadas)))}</span></div>`);
-  linhasVal.push(`<div class="linha total"><span class="rot">Total</span><span class="val">${brl(total)}</span></div>`);
-
-  const forma = String(p.formaPagamento || '').trim();
-  let pagto = '';
-  if(forma){
-    const troPara = num(p.trocoPara);
-    let extra = '';
-    if(/dinheiro/i.test(forma)){
-      if(troPara > total && total > 0) extra = `<div class="troco">Cliente paga com ${brl(troPara)} — levar ${brl(troPara - total)} de troco</div>`;
-      else extra = `<div>Sem troco</div>`;
-    }
-    pagto = `<div class="pagto">Forma de pagamento: <b>${esc(forma)}</b>${extra}</div>`;
-  }
-  const cardValores = `<section class="card" aria-labelledby="hValores">
-    <h2 id="hValores">Valores</h2>
-    <div class="linhas">${linhasVal.join('')}</div>
-    ${pagto}
-  </section>`;
-
-  /* --- Pix --- */
-  let cardPix = '';
-  if(data.pix && data.pix.payload){
-    const src = qrDataUrl(data.pix.payload, 300);
-    cardPix = `<section class="card pix" aria-labelledby="hPix">
-      <h2 id="hPix">Cobrar por Pix</h2>
-      <div class="pix-valor">${brl(data.pix.valor != null ? data.pix.valor : total)}</div>
-      <div class="pix-sub">O valor já está dentro do QR Code.</div>
-      ${src
-        ? `<div class="pix-qr"><img src="${esc(src)}" alt="QR Code Pix no valor de ${esc(brl(data.pix.valor != null ? data.pix.valor : total))}"></div>`
-        : `<div class="aviso">Não foi possível desenhar o QR Code agora. Use o botão abaixo para copiar o código Pix.</div>`}
-      <button type="button" class="btn-copiar" id="btnCopiar">${ICO_COPIAR}Copiar código Pix</button>
-      ${data.pix.recebedor ? `<div class="pix-rec">Recebedor: ${esc(data.pix.recebedor)}</div>` : ''}
-    </section>`;
-  } else {
-    cardPix = `<section class="card pix" aria-labelledby="hPix">
-      <h2 id="hPix">Cobrar por Pix</h2>
-      <div class="pix-valor">${brl(total)}</div>
-      <div class="aviso">QR Code Pix indisponível. ${esc(data.pixAviso || 'Não foi possível gerar o Pix deste pedido.')}</div>
-    </section>`;
-  }
-
-  $('conteudo').innerHTML = cardItens + cardValores + cardPix;
-
-  if($('btnCopiar')){
-    $('btnCopiar').addEventListener('click', async () => {
-      const btn = $('btnCopiar');
-      const ok = await copiarTexto(data.pix.payload);
-      btn.classList.toggle('ok', ok);
-      btn.innerHTML = ok ? ICO_OK + 'Código copiado' : ICO_COPIAR + 'Não foi possível copiar';
-      setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = ICO_COPIAR + 'Copiar código Pix'; }, 2200);
-    });
-  }
-}
-
-/* ---------- CONTATO: painel com WhatsApp / Ligar ---------- */
-let focoAnterior = null;
-function abrirContato(nome, telefoneOriginal, telInternacional){
-  focoAnterior = document.activeElement;
-  $('tituloContato').textContent = nome ? 'Falar com ' + nome : 'Falar com o cliente';
-  $('telContato').textContent = telefoneBonito(telefoneOriginal);
-  const wpp = $('opWpp'), lig = $('opLigar');
-  if(telInternacional){
-    wpp.href = 'https://wa.me/' + telInternacional;
-    wpp.removeAttribute('aria-disabled');
-  } else {
-    wpp.href = '#'; wpp.setAttribute('aria-disabled', 'true');
-  }
-  // tel: usa o número completo com +55 quando dá; senão, os dígitos como estão
-  const digitos = telInternacional ? '+' + telInternacional : soDigitos(telefoneOriginal);
-  lig.href = digitos ? 'tel:' + digitos : '#';
-  if(!digitos) lig.setAttribute('aria-disabled', 'true'); else lig.removeAttribute('aria-disabled');
-  const fundo = $('fundoContato');
-  fundo.classList.add('aberto');
-  fundo.setAttribute('aria-hidden', 'false');
-  (telInternacional ? wpp : lig).focus();
-}
-function fecharContato(){
-  const fundo = $('fundoContato');
-  fundo.classList.remove('aberto');
-  fundo.setAttribute('aria-hidden', 'true');
-  if(focoAnterior && focoAnterior.focus) focoAnterior.focus();
-}
-$('btnFecharContato').addEventListener('click', fecharContato);
-$('fundoContato').addEventListener('click', e => { if(e.target === $('fundoContato')) fecharContato(); });
-document.addEventListener('keydown', e => { if(e.key === 'Escape' && $('fundoContato').classList.contains('aberto')) fecharContato(); });
-['opWpp','opLigar'].forEach(id => $(id).addEventListener('click', () => { setTimeout(fecharContato, 300); }));
-
-/* ---------- carregamento: URL → API → tela ---------- */
-function lerIdDaUrl(){
-  const bruto = new URLSearchParams(window.location.search).get('pedido');
-  if(bruto == null || String(bruto).trim() === '') return { erro:'ausente' };
-  const id = String(bruto).trim();
-  if(!ID_RE.test(id)) return { erro:'invalido' };
-  return { id };
-}
-async function carregar(){
-  const r = lerIdDaUrl();
-  if(r.erro === 'ausente'){
-    mostrarEstado('Pedido não informado', 'Este link não traz o número do pedido. Escaneie novamente o QR Code impresso no papel do pedido.');
-    return;
-  }
-  if(r.erro === 'invalido'){
-    mostrarEstado('Número de pedido inválido', 'O número do pedido neste link não é válido. Escaneie novamente o QR Code impresso no papel do pedido.');
-    return;
-  }
-  const id = r.id;
-  $('pid').textContent = id;
-  $('conteudo').innerHTML = `<div class="estado" role="status"><div class="spinner" aria-hidden="true"></div><p>Buscando o pedido…</p></div>`;
-
-  let data;
-  const ctl = ('AbortController' in window) ? new AbortController() : null;
-  const timer = ctl ? setTimeout(() => ctl.abort(), TIMEOUT_MS) : null;
+/* ---------- consulta ao Apps Script ---------- */
+// Devolve { tipo:'ok', dados } | { tipo:'nao_encontrado' } | { tipo:'erro' }.
+// O texto de erro do servidor NUNCA vai pra tela — só as mensagens fixas acima.
+async function consultarPedido_(id){
+  const ctrl = ('AbortController' in window) ? new AbortController() : null;
+  const to = ctrl ? setTimeout(()=>ctrl.abort(), TIMEOUT_MS) : null;
   try{
     const resp = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ acao:'infoPedido', pedido:id }),
-      signal: ctl ? ctl.signal : undefined
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ acao:'statusPedido', id }),
+      signal: ctrl ? ctrl.signal : undefined
     });
-    data = await resp.json();
-  }catch(e){
-    mostrarEstado('Sem conexão', 'Não foi possível buscar o pedido agora. Verifique a internet do celular e tente de novo.', { tentar:true, id:id });
-    return;
-  }finally{
-    if(timer) clearTimeout(timer);
+    const data = await resp.json();
+    if(data && data.ok === true){
+      // garante que o que voltou é mesmo o pedido pedido (nada de misturar pedidos)
+      if(String(data.id) !== id) return { tipo:'erro' };
+      return { tipo:'ok', dados:data };
+    }
+    if(data && (data.codigo==='nao_encontrado' || data.codigo==='id_invalido' || data.erro===MSG_NAO_ENCONTRADO)){
+      return { tipo:'nao_encontrado' };
+    }
+    return { tipo:'erro' };
+  } catch(e){
+    return { tipo:'erro' };
+  } finally {
+    if(to) clearTimeout(to);
+  }
+}
+
+/* ---------- telas ---------- */
+function mostrarMensagem_(texto, comRetry){
+  $('conteudo').innerHTML =
+    `<div class="empty-note">${esc_(texto)}</div>` +
+    (comRetry ? `<button class="btn-retry" onclick="tentarNovamente_()">Tentar novamente</button>` : '');
+}
+
+function statusHtml_(p){
+  const st = TRACK_ORDEM_.indexOf(p.status) > -1 ? p.status : 'novo';
+
+  // Pedido entregue: só esta parte da tela muda — vira o agradecimento.
+  // (Nome, itens, forma de pagamento e Pix continuam aparecendo embaixo.)
+  if(st === 'entregue'){
+    return `<div class="thanks-box">
+      <div class="ico-big">${TRACK_ICONES_.entregue}</div>
+      <h2>Bom apetite!</h2>
+      <p>Seu pedido foi entregue. Muito obrigado por escolher a Douratta Pizzaria!</p>
+      <p>Esperamos que você aproveite cada pedaço. Volte sempre — vai ser um prazer te atender de novo.</p>
+    </div>`;
   }
 
-  if(!data || data.ok !== true){
-    const cod = data && data.codigo;
-    const erroTxt = String((data && data.erro) || '');
-    if(cod === 'nao_encontrado'){
-      mostrarEstado('Pedido não encontrado', 'Não existe pedido com este número. Confira o QR Code do papel ou avise a pizzaria.', { id:id });
-    } else if(cod === 'id_invalido'){
-      mostrarEstado('Número de pedido inválido', 'O número do pedido neste link não é válido. Escaneie novamente o QR Code do papel.', { id:id });
-    } else if(/Ação desconhecida/i.test(erroTxt)){
-      mostrarEstado('Servidor desatualizado', 'O Apps Script ainda não conhece a ação "infoPedido". Publique uma NOVA VERSÃO da implantação do Code.gs e tente de novo.', { tentar:true, id:id });
-    } else {
-      mostrarEstado('Não foi possível carregar', erroTxt || 'Ocorreu um erro ao consultar o pedido. Tente novamente.', { tentar:true, id:id });
-    }
-    return;
-  }
-  renderPedido(data);
+  const idxAtual = TRACK_ORDEM_.indexOf(st);
+  const emEspera = st === 'novo';
+  const passos = [
+    `<div class="track-step ${emEspera?'current':'done'}">
+      <div class="ico" data-spin="${emEspera?'1':'0'}">${TRACK_ICONES_.espera}</div>
+      <div class="txt">Aguardando confirmação</div>
+    </div>`
+  ];
+  TRACK_ETAPAS_.forEach(et=>{
+    const idxEtapa = TRACK_ORDEM_.indexOf(et.chave);
+    const isDone = idxAtual > idxEtapa;
+    const isCurrent = et.chave === st;
+    passos.push(`<div class="track-step ${isDone?'done':''} ${isCurrent?'current':''}">
+      <div class="ico" data-spin="${isCurrent && et.chave==='em_preparo' ? '1':'0'}">${TRACK_ICONES_[et.chave]}</div>
+      <div class="txt">${et.label}</div>
+    </div>`);
+  });
+  // Botão do cliente: aparece quando o pedido saiu para entrega (é a única etapa em que
+  // o Apps Script aceita a confirmação — "confirmarEntregaCliente").
+  const botao = st === 'em_rota' ? `
+    <div class="confirm-hint">Recebeu seu pedido? Confirme aqui.</div>
+    <button class="btn-recebi" onclick="confirmarEntrega_(this)">
+      <span class="material-symbols-outlined" style="font-size:18px;">check_circle</span> Confirmar entrega
+    </button>` : '';
+  return `
+    <h2><span class="material-symbols-outlined">local_shipping</span> Status do pedido</h2>
+    <div class="track-steps">${passos.join('')}</div>
+    ${botao}
+    <div class="msg-inline" id="msgStatus" role="status"></div>`;
 }
-carregar();
+
+function atualizarStatus_(p){
+  const st = p.status || 'novo';
+  if(st === statusRenderizado_) return;   // sem mudança: não redesenha (evita piscar)
+  statusRenderizado_ = st;
+  const el = $('cardStatus');
+  if(el) el.innerHTML = statusHtml_(p);
+}
+
+function render_(p){
+  statusRenderizado_ = p.status || 'novo';
+  const pix = p.pix || null;
+  const qrPixUrl = pix ? `https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=8&data=${encodeURIComponent(pix.payload)}` : '';
+  const pixCardHtml = pix
+    ? `<img src="${qrPixUrl}" alt="QR Code Pix">
+      <div class="pix-chave" id="pixChaveTxt">${esc_(pix.recebedor||'')}</div>
+      <button class="btn-copiar" onclick="copiarPix_()">
+        <span class="material-symbols-outlined" style="font-size:17px;">content_copy</span>
+        Copiar código Pix (copia e cola)
+      </button>
+      <div class="aviso">O QR Code já vem com o valor de ${formatBRL(p.total)} preenchido — é só escanear no app do banco e confirmar.</div>`
+    : `<div class="aviso">QR Code Pix indisponível. ${esc_(p.pixAviso || 'Não foi possível gerar o Pix deste pedido.')}</div>`;
+
+  $('conteudo').innerHTML = `
+    <div class="card" id="cardStatus">${statusHtml_(p)}</div>
+
+    <div class="card">
+      <span class="status-tag">Pedido ${esc_(p.id)}</span>
+      <h2><span class="material-symbols-outlined">person</span> ${esc_(p.nome||'Cliente')}</h2>
+      <div class="linha"><span>Forma de pagamento</span><span><b>${esc_(p.formaPagamento||'')}</b></span></div>
+    </div>
+
+    <div class="card">
+      <h2><span class="material-symbols-outlined">restaurant_menu</span> Itens do pedido</h2>
+      ${(p.itens||[]).map(itemHtml_).join('')}
+      <div class="linha" style="margin-top:8px;"><span>Subtotal</span><span>${formatBRL(p.subtotal)}</span></div>
+      <div class="linha"><span>Frete</span><span>${formatBRL(p.frete)}</span></div>
+      ${Number(p.desconto)?`<div class="linha"><span>Desconto</span><span>-${formatBRL(p.desconto)}</span></div>`:''}
+      <div class="total-row"><span>Total a cobrar</span><span class="valor">${formatBRL(p.total)}</span></div>
+    </div>
+
+    <div class="card pix-card">
+      <h2 style="justify-content:center;"><span class="material-symbols-outlined">qr_code_2</span> Pagamento via Pix</h2>
+      ${pixCardHtml}
+    </div>
+  `;
+  window._payloadPixAtual = pix ? pix.payload : '';
+}
+
+function copiarPix_(){
+  const texto = window._payloadPixAtual || '';
+  if(!texto) return;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(texto).then(()=>alert('Código Pix copiado!'));
+  } else {
+    alert('Não foi possível copiar automaticamente. Copie o código exibido na tela.');
+  }
+}
+
+/* ---------- "Já recebi meu pedido" (ação que já existe no Apps Script) ---------- */
+async function confirmarEntrega_(btn){
+  if(btn.disabled) return;
+  btn.disabled = true;
+  const msg = $('msgStatus');
+  if(msg) msg.textContent = '';
+  try{
+    const resp = await fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body: JSON.stringify({ acao:'confirmarEntregaCliente', id: pedidoId_ })
+    });
+    const data = await resp.json();
+    if(data && data.ok === true){
+      pararPolling_();
+      atualizarStatus_({ status:'entregue' });
+      return;
+    }
+  } catch(e){ /* cai na mensagem abaixo */ }
+  if(msg) msg.textContent = 'Não foi possível confirmar agora. Tente novamente.';
+  btn.disabled = false;
+}
+
+/* ---------- atualização automática do status ---------- */
+function pararPolling_(){ if(pollTimer_){ clearInterval(pollTimer_); pollTimer_ = null; } }
+function agendarPolling_(){
+  pararPolling_();
+  pollTimer_ = setInterval(()=>{ if(!document.hidden) buscar_(); }, POLL_MS);
+}
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden && renderizado_ && pollTimer_) buscar_(); });
+
+async function buscar_(){
+  if(consultando_) return;
+  consultando_ = true;
+  try{
+    const r = await consultarPedido_(pedidoId_);
+    if(r.tipo === 'ok'){
+      if(!renderizado_){ render_(r.dados); renderizado_ = true; }
+      else atualizarStatus_(r.dados);
+      if((r.dados.status||'novo') === 'entregue') pararPolling_();
+      else if(!pollTimer_) agendarPolling_();
+    } else if(!renderizado_){
+      mostrarMensagem_(r.tipo==='nao_encontrado' ? MSG_NAO_ENCONTRADO : MSG_ERRO, r.tipo==='erro');
+    }
+    // Se a tela já estava montada e essa atualização falhou, mantém o que está na
+    // tela e tenta de novo no próximo ciclo.
+  } finally {
+    consultando_ = false;
+  }
+}
+
+function tentarNovamente_(){
+  $('conteudo').innerHTML = '<div class="loading-note">Carregando pedido…</div>';
+  buscar_();
+}
+
+/* ---------- início: lê ?id= da URL ---------- */
+function iniciar_(){
+  const bruto = new URLSearchParams(location.search).get('id');
+  const id = (bruto || '').trim();
+  if(!id){ mostrarMensagem_(MSG_SEM_ID); return; }
+  if(!ID_VALIDO_.test(id)){ mostrarMensagem_(MSG_NAO_ENCONTRADO); return; }
+  pedidoId_ = id;
+  buscar_();
+}
+iniciar_();
 </script>
 </body>
 </html>
