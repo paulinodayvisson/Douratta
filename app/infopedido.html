@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -171,13 +172,6 @@ const TIMEOUT_MS = 25000;
 // Mesma regra de validação do Apps Script (normalizarIdPedido_).
 const ID_RE = /^[A-Za-z0-9_-]{3,40}$/;
 
-// Chave Pix que recebe o pagamento — mesmo padrão usado em /pedidos (pedidos-1.html):
-// o QR Code é montado aqui, no navegador, com esta chave fixa. Se a chave Pix
-// da pizzaria mudar, atualize aqui E também em pedidos-1.html.
-const PIX_CHAVE = 'mcmb013579@gmail.com';
-const PIX_NOME_RECEBEDOR = 'DOURATTA PIZZARIA';
-const PIX_CIDADE = 'SETE LAGOAS';
-
 /* ---------- helpers ---------- */
 const $ = id => document.getElementById(id);
 function esc(v){
@@ -319,43 +313,6 @@ function qrDataUrl(texto, tamanho){
     return cv ? cv.toDataURL('image/png') : '';
   }catch(e){ return ''; }
 }
-
-/* ---------- monta o "Pix copia e cola" (EMV/BR Code) na mão ----------
-   Mesmo código usado em pedidos-1.html: usa a chave PIX_CHAVE fixa acima,
-   sem depender do backend/planilha pra montar o Pix. ---------- */
-function semAcentoPix_(txt){
-  return String(txt==null?'':txt).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x00-\x7F]/g,'');
-}
-function tlv_(id, valor){
-  const len = String(valor.length).padStart(2,'0');
-  return id + len + valor;
-}
-function crc16_(str){
-  let crc = 0xFFFF;
-  for(let i=0;i<str.length;i++){
-    crc ^= str.charCodeAt(i) << 8;
-    for(let j=0;j<8;j++){
-      crc = (crc & 0x8000) ? ((crc<<1) ^ 0x1021) : (crc<<1);
-      crc &= 0xFFFF;
-    }
-  }
-  return crc.toString(16).toUpperCase().padStart(4,'0');
-}
-function montarPayloadPix_(valor, txid){
-  const gui = tlv_('00','br.gov.bcb.pix');
-  const chave = tlv_('01', PIX_CHAVE);
-  const contaPix = tlv_('26', gui + chave);
-  const mcc = tlv_('52','0000');
-  const moeda = tlv_('53','986');
-  const valorTlv = valor ? tlv_('54', Number(valor).toFixed(2)) : '';
-  const pais = tlv_('58','BR');
-  const nome = tlv_('59', semAcentoPix_(PIX_NOME_RECEBEDOR).slice(0,25));
-  const cidade = tlv_('60', semAcentoPix_(PIX_CIDADE).slice(0,15));
-  const txidLimpo = semAcentoPix_(txid||'').replace(/[^A-Za-z0-9]/g,'').slice(0,25) || '***';
-  const dadosAdicionais = tlv_('62', tlv_('05', txidLimpo));
-  const semCrc = tlv_('00','01') + contaPix + mcc + moeda + valorTlv + pais + nome + cidade + dadosAdicionais + '6304';
-  return semCrc + crc16_(semCrc);
-}
 async function copiarTexto(txt){
   try{ await navigator.clipboard.writeText(txt); return true; }catch(e){}
   try{
@@ -462,27 +419,25 @@ function renderPedido(data){
     ${pagto}
   </section>`;
 
-  /* --- Pix (montado aqui no navegador, mesmo padrão de pedidos-1.html) --- */
+  /* --- Pix --- */
   let cardPix = '';
-  let payloadPixAtual = '';
-  if(total > 0){
-    payloadPixAtual = montarPayloadPix_(total, p.id);
-    const src = qrDataUrl(payloadPixAtual, 300);
+  if(data.pix && data.pix.payload){
+    const src = qrDataUrl(data.pix.payload, 300);
     cardPix = `<section class="card pix" aria-labelledby="hPix">
       <h2 id="hPix">Cobrar por Pix</h2>
-      <div class="pix-valor">${brl(total)}</div>
+      <div class="pix-valor">${brl(data.pix.valor != null ? data.pix.valor : total)}</div>
       <div class="pix-sub">O valor já está dentro do QR Code.</div>
       ${src
-        ? `<div class="pix-qr"><img src="${esc(src)}" alt="QR Code Pix no valor de ${esc(brl(total))}"></div>`
+        ? `<div class="pix-qr"><img src="${esc(src)}" alt="QR Code Pix no valor de ${esc(brl(data.pix.valor != null ? data.pix.valor : total))}"></div>`
         : `<div class="aviso">Não foi possível desenhar o QR Code agora. Use o botão abaixo para copiar o código Pix.</div>`}
       <button type="button" class="btn-copiar" id="btnCopiar">${ICO_COPIAR}Copiar código Pix</button>
-      <div class="pix-rec">Recebedor: ${esc(PIX_NOME_RECEBEDOR)}</div>
+      ${data.pix.recebedor ? `<div class="pix-rec">Recebedor: ${esc(data.pix.recebedor)}</div>` : ''}
     </section>`;
   } else {
     cardPix = `<section class="card pix" aria-labelledby="hPix">
       <h2 id="hPix">Cobrar por Pix</h2>
       <div class="pix-valor">${brl(total)}</div>
-      <div class="aviso">Este pedido não tem valor a cobrar.</div>
+      <div class="aviso">QR Code Pix indisponível. ${esc(data.pixAviso || 'Não foi possível gerar o Pix deste pedido.')}</div>
     </section>`;
   }
 
@@ -491,7 +446,7 @@ function renderPedido(data){
   if($('btnCopiar')){
     $('btnCopiar').addEventListener('click', async () => {
       const btn = $('btnCopiar');
-      const ok = await copiarTexto(payloadPixAtual);
+      const ok = await copiarTexto(data.pix.payload);
       btn.classList.toggle('ok', ok);
       btn.innerHTML = ok ? ICO_OK + 'Código copiado' : ICO_COPIAR + 'Não foi possível copiar';
       setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = ICO_COPIAR + 'Copiar código Pix'; }, 2200);
