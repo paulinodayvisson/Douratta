@@ -235,6 +235,14 @@ table td.mono{font-family:var(--font-mono);}
       <span class="material-symbols-outlined">redeem</span>
       Giro Premiado
     </button>
+    <button class="tab-btn" data-tab="custos" onclick="mudarAba('custos')">
+      <span class="material-symbols-outlined">calculate</span>
+      Custos
+    </button>
+    <button class="tab-btn" data-tab="financeiro" onclick="mudarAba('financeiro')">
+      <span class="material-symbols-outlined">monitoring</span>
+      Financeiro
+    </button>
     <button class="tab-btn" data-tab="configuracoes" onclick="mudarAba('configuracoes')">
       <span class="material-symbols-outlined">settings</span>
       Configurações
@@ -252,6 +260,8 @@ table td.mono{font-family:var(--font-mono);}
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
     <div class="tab-panel" id="tabCacaniquel"><div class="loading-note">Carregando…</div></div>
+    <div class="tab-panel" id="tabCustos"><div class="loading-note">Carregando…</div></div>
+    <div class="tab-panel" id="tabFinanceiro"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabConfiguracoes"><div class="loading-note">Carregando configurações…</div></div>
   </div>
 </div>
@@ -509,6 +519,8 @@ function mudarAba(nome){
   if(nome==='checklist') renderChecklist();
   if(nome==='configuracoes') carregarConfiguracoes();
   if(nome==='cacaniquel') carregarCacaNiquel();
+  if(nome==='custos') carregarCustos();
+  if(nome==='financeiro') carregarFinanceiro();
 }
 
 /* ---------- ciclo de atualização (pedidos) ---------- */
@@ -944,6 +956,273 @@ async function salvarCacaNiquel(btn){
   if(restaurar) restaurar();
   if(!d.ok){ alert(d.erro||'Não foi possível salvar agora.'); return; }
   cacaCache = d; renderCacaNiquel();
+}
+
+
+/* =========================================================
+   CUSTOS (calculadora + variáveis + fixos) e FINANCEIRO
+   ========================================================= */
+let cuDados=null, cuSub='calc', cuSel={alvo:'',tam:''}, cuLinhas=[], cuEditVar=null, cuBusca='', cuFixosEd=[];
+const CU_CATS=['Ingrediente','Tempero','Bebida (revenda)','Embalagem','Utilidade','Mão de obra','Transporte','Limpeza','Outros'];
+const CU_UNIDADES=['kg','g','L','ml','un','kWh','m³','h','min','km'];
+function cuEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function cuBRL(n,d){return 'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:d||2});}
+function cuN(v){const n=parseFloat(String(v==null?'':v).replace(',','.'));return isNaN(n)?0:n;}
+const CU_CSS=`<style>
+.cu-nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
+.cu-nav button{padding:8px 14px;border-radius:99px;font-weight:700;font-size:.8rem;background:var(--bianco);border:1.5px solid var(--linha);}
+.cu-nav button.on{background:var(--carvao);color:#fff;border-color:var(--carvao);}
+.cu-card{background:var(--bianco);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(33,26,15,.07);margin-bottom:14px;max-width:760px;}
+.cu-card h3{font-family:var(--font-display);font-size:1.05rem;margin-bottom:8px;}
+.cu-in{width:100%;padding:9px 10px;border:1.5px solid rgba(33,26,15,.2);border-radius:10px;font-size:.9rem;background:#fff;}
+.cu-lb{font-size:.74rem;font-weight:700;display:block;margin:10px 0 3px;}
+.cu-row{display:grid;grid-template-columns:1fr 84px 30px;gap:6px;align-items:center;margin-bottom:8px;}
+.cu-rowinfo{grid-column:1/-1;font-size:.72rem;opacity:.7;margin:-4px 0 4px;}
+.cu-sum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
+.cu-sum div{background:var(--avorio);border-radius:12px;padding:10px;}
+.cu-sum b{display:block;font-size:1.05rem;font-family:var(--font-mono);}
+.cu-sum span{font-size:.7rem;opacity:.7;}
+.cu-var{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--linha);cursor:pointer;font-size:.86rem;}
+.cu-var small{display:block;opacity:.65;font-size:.72rem;}
+.cu-cat{font-weight:800;font-size:.72rem;letter-spacing:.5px;text-transform:uppercase;opacity:.55;margin:14px 0 2px;}
+.cu-btn{background:var(--dourado);color:var(--carvao);padding:11px 16px;border-radius:10px;font-weight:800;font-size:.85rem;}
+.cu-btn.sec{background:var(--avorio-dark);}
+.cu-btn.red{background:var(--vermelho);color:#fff;}
+.cu-x{color:var(--vermelho);font-weight:800;font-size:1.1rem;}
+.cu-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:760px;}
+.cu-kpi{background:var(--bianco);border-radius:14px;padding:12px;box-shadow:0 3px 12px rgba(33,26,15,.06);}
+.cu-kpi span{font-size:.7rem;opacity:.65;font-weight:700;}
+.cu-kpi b{display:block;font-size:1.15rem;font-family:var(--font-mono);margin-top:2px;}
+.cu-pos{color:var(--verde);} .cu-neg{color:var(--vermelho);}
+.cu-filtros{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.cu-filtros button{padding:7px 12px;border-radius:99px;font-size:.76rem;font-weight:700;background:var(--bianco);border:1.5px solid var(--linha);}
+.cu-filtros button.on{background:var(--dourado);border-color:var(--dourado-dark);}
+.cu-tbl{width:100%;border-collapse:collapse;font-size:.78rem;}
+.cu-tbl th,.cu-tbl td{padding:6px 4px;text-align:right;border-bottom:1px solid var(--linha);} .cu-tbl th:first-child,.cu-tbl td:first-child{text-align:left;}
+.cu-bar{height:10px;border-radius:5px;background:var(--dourado);}
+</style>`;
+
+async function carregarCustos(){
+  const el=document.getElementById('tabCustos');
+  el.innerHTML='<div class="loading-note">Carregando…</div>';
+  const d=await apiPost('custoObter',{}).catch(()=>({ok:false}));
+  if(!d.ok){el.innerHTML=`<div class="empty-note">${cuEsc(d.erro||'Não foi possível carregar. Atualize o Code.gs e gere uma nova implantação.')}</div>`;return;}
+  cuDados=d; if(cuSub==='calc'&&cuSel.alvo) cuCarregarLinhas(); renderCustos();
+}
+function cuTrocarSub(k){cuSub=k;cuEditVar=null;if(k==='fixos'){cuFixosEd=cuDados.fixos.map(f=>({...f}));}renderCustos();}
+function renderCustos(){
+  const el=document.getElementById('tabCustos');
+  const nav=[['calc','🧮 Calculadora'],['vars','📦 Variáveis'],['fixos','🏠 Fixos e taxas']].map(([k,l])=>`<button class="${cuSub===k?'on':''}" onclick="cuTrocarSub('${k}')">${l}</button>`).join('');
+  el.innerHTML=CU_CSS+`<div class="cu-nav">${nav}</div><div id="cuCorpo"></div>`;
+  if(cuSub==='calc') cuRenderCalc(); else if(cuSub==='vars') cuRenderVars(); else cuRenderFixos();
+}
+/* ---- Calculadora ---- */
+function cuAlvoAtual(){const [t,...r]=String(cuSel.alvo).split(':');const id=r.join(':');return cuDados.alvos.find(a=>a.tipo===t&&a.id===id)||null;}
+function cuCarregarLinhas(){
+  const a=cuAlvoAtual(); if(!a){cuLinhas=[];return;}
+  cuLinhas=cuDados.receitas.filter(r=>r.alvoTipo===a.tipo&&r.alvoId===a.id&&r.tamanho===cuSel.tam).map(r=>({variavelId:r.variavelId,quantidade:r.quantidade}));
+}
+function cuEscolherAlvo(v){cuSel.alvo=v;const a=cuAlvoAtual();cuSel.tam=a?a.tamanhos[0].key:'';cuCarregarLinhas();cuRenderCalc();}
+function cuEscolherTam(v){cuSel.tam=v;cuCarregarLinhas();cuRenderCalc();}
+function cuOptVars(sel){
+  const g={};cuDados.variaveis.filter(v=>v.ativo||v.id===sel).forEach(v=>{(g[v.categoria]=g[v.categoria]||[]).push(v);});
+  return '<option value="">— escolha a variável —</option>'+Object.keys(g).map(c=>`<optgroup label="${cuEsc(c)}">${g[c].map(v=>`<option value="${cuEsc(v.id)}" ${v.id===sel?'selected':''}>${cuEsc(v.nome)} (${cuEsc(v.unidade)})</option>`).join('')}</optgroup>`).join('');
+}
+function cuRenderCalc(){
+  const d=cuDados,c=document.getElementById('cuCorpo');
+  const gr={};d.alvos.forEach(a=>{(gr[a.grupo]=gr[a.grupo]||[]).push(a);});
+  const optA='<option value="">— escolha o produto —</option>'+Object.keys(gr).map(g=>`<optgroup label="${cuEsc(g)}">${gr[g].map(a=>`<option value="${a.tipo}:${cuEsc(a.id)}" ${cuSel.alvo===a.tipo+':'+a.id?'selected':''}>${cuEsc(a.nome)}${a.ativo?'':' (inativo)'}</option>`).join('')}</optgroup>`).join('');
+  const a=cuAlvoAtual();
+  let corpo='';
+  if(a){
+    const tamSel=a.tamanhos.length>1?`<label class="cu-lb">Tamanho</label><select class="cu-in" onchange="cuEscolherTam(this.value)">${a.tamanhos.map(t=>`<option value="${cuEsc(t.key)}" ${t.key===cuSel.tam?'selected':''}>${cuEsc(t.label)}${t.preco?' — venda '+cuBRL(t.preco):''}</option>`).join('')}</select>`:'';
+    corpo=`${tamSel}<label class="cu-lb">O que entra (na mesma unidade da variável)</label><div id="cuLinhas"></div>
+      <button class="cu-btn sec" style="width:100%;margin-top:4px;" onclick="cuAddLinha()">+ Adicionar variável</button>
+      <div class="cu-sum" id="cuTotais"></div>
+      <button class="cu-btn" style="width:100%;margin-top:14px;" onclick="cuSalvarReceita(this)">Salvar custo deste produto</button>`;
+  }
+  c.innerHTML=`<div class="cu-card"><h3>Calculadora de custo</h3><p style="font-size:.78rem;opacity:.7;margin-bottom:8px;">Escolha o produto e some as variáveis usadas (ex.: 0,2 kg de muçarela). O custo é salvo na aba Produtos e alimenta o Financeiro.</p>
+    <select class="cu-in" onchange="cuEscolherAlvo(this.value)">${optA}</select>${corpo}</div>`;
+  if(a) cuRenderLinhas();
+}
+function cuRenderLinhas(){
+  const box=document.getElementById('cuLinhas');
+  box.innerHTML=cuLinhas.map((l,i)=>{
+    const v=cuDados.variaveis.find(x=>x.id===l.variavelId);
+    return `<div class="cu-row"><select class="cu-in" onchange="cuLinhas[${i}].variavelId=this.value;cuRenderLinhas()">${cuOptVars(l.variavelId)}</select>
+      <input class="cu-in" type="number" step="any" min="0" inputmode="decimal" placeholder="${v?cuEsc(v.unidade):'qtd'}" value="${l.quantidade===''?'':l.quantidade}" oninput="cuLinhas[${i}].quantidade=cuN(this.value);cuAtualizarTotais()">
+      <button class="cu-x" onclick="cuLinhas.splice(${i},1);cuRenderLinhas()">✕</button>
+      <div class="cu-rowinfo" id="cuInfo${i}"></div></div>`;
+  }).join('')||'<p style="font-size:.8rem;opacity:.55;margin:6px 0;">Nenhuma variável ainda.</p>';
+  cuAtualizarTotais();
+}
+function cuAddLinha(){cuLinhas.push({variavelId:'',quantidade:''});cuRenderLinhas();}
+function cuAtualizarTotais(){
+  const d=cuDados;let total=0;
+  cuLinhas.forEach((l,i)=>{
+    const v=d.variaveis.find(x=>x.id===l.variavelId);const q=cuN(l.quantidade);const custo=v?q*v.custoEfetivo:0;total+=custo;
+    const info=document.getElementById('cuInfo'+i);if(!info)return;
+    if(!v){info.textContent='';return;}
+    let eq='';if(v.unidade==='kg')eq=` = ${(q*1000).toLocaleString('pt-BR')} g ·`;if(v.unidade==='L')eq=` = ${(q*1000).toLocaleString('pt-BR')} ml ·`;
+    info.textContent=`${eq} ${cuBRL(v.preco,4)}/${v.unidade}${v.desperdicio?' +'+v.desperdicio+'% desperdício':''} → ${cuBRL(custo,4)}`;
+  });
+  const a=cuAlvoAtual();const t=a?a.tamanhos.find(x=>x.key===cuSel.tam):null;const preco=t?t.preco:0;
+  const lucro=preco-total,marg=preco>0?lucro/preco*100:0;const md=cuN(d.config.margemDesejadaPct);
+  const sug=md<100?total/(1-md/100):0;
+  const el=document.getElementById('cuTotais');if(!el)return;
+  el.innerHTML=`<div><span>Custo total</span><b>${cuBRL(total)}</b></div><div><span>Preço de venda atual</span><b>${preco?cuBRL(preco):'—'}</b></div>
+    <div><span>Lucro por unidade</span><b class="${lucro>=0?'cu-pos':'cu-neg'}">${preco?cuBRL(lucro):'—'}</b></div><div><span>Margem</span><b class="${marg>=md?'cu-pos':'cu-neg'}">${preco?marg.toFixed(1)+'%':'—'}</b></div>
+    <div style="grid-column:1/-1"><span>Preço sugerido p/ margem de ${md}%</span><b>${total>0?cuBRL(sug):'—'}</b></div>`;
+}
+async function cuSalvarReceita(btn){
+  const a=cuAlvoAtual();if(!a)return;
+  const rest=setBtnLoading_(btn,'Salvando...');
+  const d=await apiPost('custoSalvarReceita',{alvoTipo:a.tipo,alvoId:a.id,tamanho:cuSel.tam,linhas:cuLinhas.filter(l=>l.variavelId)}).catch(()=>({ok:false}));
+  if(rest)rest();
+  if(!d.ok){alert(d.erro||'Não foi possível salvar.');return;}
+  cuDados=d;cuCarregarLinhas();cuRenderCalc();alert('Custo salvo!');
+}
+/* ---- Variáveis ---- */
+function cuRenderVars(){
+  const c=document.getElementById('cuCorpo');
+  if(cuEditVar){cuRenderFormVar(c);return;}
+  c.innerHTML=`<div class="cu-card"><div style="display:flex;gap:8px;"><input class="cu-in" placeholder="Buscar variável…" value="${cuEsc(cuBusca)}" oninput="cuBusca=this.value;cuRenderListaVars()"><button class="cu-btn" style="white-space:nowrap;" onclick="cuNovaVar()">+ Nova</button></div><div id="cuListaVars"></div></div>`;
+  cuRenderListaVars();
+}
+function cuRenderListaVars(){
+  const q=cuBusca.trim().toLowerCase(),g={};
+  cuDados.variaveis.filter(v=>!q||v.nome.toLowerCase().includes(q)||v.categoria.toLowerCase().includes(q)).forEach(v=>{(g[v.categoria]=g[v.categoria]||[]).push(v);});
+  document.getElementById('cuListaVars').innerHTML=Object.keys(g).map(cat=>`<div class="cu-cat">${cuEsc(cat)}</div>`+g[cat].map(v=>`<div class="cu-var" onclick="cuEditarVar('${cuEsc(v.id)}')" style="${v.ativo?'':'opacity:.45'}"><div><b>${cuEsc(v.nome)}</b><small>Estoque: ${v.estoque} ${cuEsc(v.unidade)} = ${cuBRL(v.valorEstoque)}${v.desperdicio?' · desperdício '+v.desperdicio+'%':''}</small></div><div style="text-align:right;font-family:var(--font-mono);">${v.preco?cuBRL(v.preco,4):'<span class="cu-neg">sem preço</span>'}<small>/ ${cuEsc(v.unidade)}</small></div></div>`).join('')).join('')||'<div class="empty-note">Nada encontrado.</div>';
+}
+function cuNovaVar(){cuEditVar={id:'',nome:'',categoria:'Ingrediente',unidade:'kg',preco:0,estoque:0,desperdicio:0,obs:'',ativo:true};cuRenderVars();}
+function cuEditarVar(id){cuEditVar={...cuDados.variaveis.find(v=>v.id===id)};cuRenderVars();}
+function cuRenderFormVar(c){
+  const v=cuEditVar;
+  const optC=[...new Set([...CU_CATS,v.categoria])].map(x=>`<option ${x===v.categoria?'selected':''}>${cuEsc(x)}</option>`).join('');
+  const optU=[...new Set([...CU_UNIDADES,v.unidade])].map(x=>`<option ${x===v.unidade?'selected':''}>${cuEsc(x)}</option>`).join('');
+  c.innerHTML=`<div class="cu-card"><h3>${v.id?'Editar':'Nova'} variável</h3>
+    <label class="cu-lb">Nome</label><input class="cu-in" id="fvNome" value="${cuEsc(v.nome)}">
+    <label class="cu-lb">Categoria</label><select class="cu-in" id="fvCat">${optC}</select>
+    <label class="cu-lb">Unidade de medida (a da compra)</label><select class="cu-in" id="fvUn">${optU}</select>
+    <label class="cu-lb">Valor por unidade (R$) — ex.: 13 por kg</label><input class="cu-in" id="fvPreco" type="number" step="any" inputmode="decimal" value="${v.preco}" oninput="cuFormCalc()">
+    <label class="cu-lb">Quantidade em estoque (na mesma unidade)</label><input class="cu-in" id="fvEst" type="number" step="any" inputmode="decimal" value="${v.estoque}" oninput="cuFormCalc()">
+    <label class="cu-lb">Desperdício / perda (%) — ex.: cebola 10</label><input class="cu-in" id="fvDesp" type="number" step="any" inputmode="decimal" value="${v.desperdicio}" oninput="cuFormCalc()">
+    <label class="cu-lb">Observação</label><input class="cu-in" id="fvObs" value="${cuEsc(v.obs)}">
+    <label class="cu-lb" style="display:flex;gap:8px;align-items:center;"><input type="checkbox" id="fvAtivo" ${v.ativo?'checked':''}> Ativa</label>
+    <div class="cu-sum"><div><span>Valor em estoque</span><b id="fvValEst">—</b></div><div><span>Custo real por unidade</span><b id="fvEf">—</b></div></div>
+    <div style="display:flex;gap:8px;margin-top:14px;"><button class="cu-btn" style="flex:1" onclick="cuSalvarVar(this)">Salvar</button><button class="cu-btn sec" onclick="cuEditVar=null;cuRenderVars()">Voltar</button>${v.id?'<button class="cu-btn red" onclick="cuExcluirVar()">Excluir</button>':''}</div></div>`;
+  cuFormCalc();
+}
+function cuFormCalc(){
+  const p=cuN(document.getElementById('fvPreco').value),e=cuN(document.getElementById('fvEst').value),d=Math.min(95,cuN(document.getElementById('fvDesp').value));
+  document.getElementById('fvValEst').textContent=cuBRL(p*e);document.getElementById('fvEf').textContent=cuBRL(p/(1-d/100),4);
+}
+async function cuSalvarVar(btn){
+  const v={...cuEditVar,nome:document.getElementById('fvNome').value.trim(),categoria:document.getElementById('fvCat').value,unidade:document.getElementById('fvUn').value,
+    preco:cuN(document.getElementById('fvPreco').value),estoque:cuN(document.getElementById('fvEst').value),desperdicio:cuN(document.getElementById('fvDesp').value),
+    obs:document.getElementById('fvObs').value,ativo:document.getElementById('fvAtivo').checked};
+  const rest=setBtnLoading_(btn,'Salvando...');
+  const d=await apiPost('custoSalvarVariavel',{variavel:v}).catch(()=>({ok:false}));
+  if(rest)rest();
+  if(!d.ok){alert(d.erro||'Não foi possível salvar.');return;}
+  cuDados=d;cuEditVar=null;cuRenderVars();
+}
+async function cuExcluirVar(){
+  if(!confirm('Excluir esta variável?'))return;
+  const d=await apiPost('custoExcluirVariavel',{id:cuEditVar.id}).catch(()=>({ok:false}));
+  if(!d.ok){alert(d.erro||'Não foi possível excluir.');return;}
+  cuDados=d;cuEditVar=null;cuRenderVars();
+}
+/* ---- Fixos e taxas ---- */
+function cuRenderFixos(){
+  const c=document.getElementById('cuCorpo'),cf=cuDados.config;
+  const campo=(k,l,dica)=>`<label class="cu-lb">${l}</label><input class="cu-in" type="number" step="any" inputmode="decimal" id="cp_${k}" value="${cf[k]}">${dica?`<div style="font-size:.7rem;opacity:.6;">${dica}</div>`:''}`;
+  c.innerHTML=`<div class="cu-card"><h3>Custos fixos mensais</h3><p style="font-size:.78rem;opacity:.7;margin-bottom:8px;">Aluguel, internet, salários... São divididos pelos pedidos estimados do mês (rateio por pedido).</p>
+    <div id="cuFixos"></div><button class="cu-btn sec" style="width:100%" onclick="cuFixosEd.push({id:'',nome:'',valor:0,ativo:true});cuDesenharFixos()">+ Adicionar custo fixo</button>
+    <div class="cu-sum"><div><span>Total fixo / mês</span><b id="cuFixTot">—</b></div><div><span>Rateio por pedido</span><b id="cuFixRat">—</b></div></div></div>
+    <div class="cu-card"><h3>Taxas e parâmetros</h3>
+    ${campo('pedidosMesEstimado','Pedidos estimados por mês')}${campo('taxaPixPct','Taxa do Pix (%)')}${campo('taxaCartaoPct','Taxa do cartão (%)')}${campo('impostoPct','Imposto sobre vendas (%)')}
+    ${campo('custoEntregaPorPedido','Custo de entrega por pedido (R$)','Gasolina + desgaste + motoboy, em média. Só entra em pedidos com frete.')}${campo('margemDesejadaPct','Margem de lucro desejada (%)','Usada no preço sugerido da calculadora.')}
+    <button class="cu-btn" style="width:100%;margin-top:14px;" onclick="cuSalvarParams(this)">Salvar</button></div>`;
+  cuDesenharFixos();
+}
+function cuDesenharFixos(){
+  document.getElementById('cuFixos').innerHTML=cuFixosEd.map((f,i)=>`<div class="cu-row" style="grid-template-columns:1fr 100px 30px;"><input class="cu-in" placeholder="Nome" value="${cuEsc(f.nome)}" oninput="cuFixosEd[${i}].nome=this.value"><input class="cu-in" type="number" step="any" inputmode="decimal" placeholder="R$/mês" value="${f.valor||''}" oninput="cuFixosEd[${i}].valor=cuN(this.value);cuTotFixos()"><button class="cu-x" onclick="cuFixosEd.splice(${i},1);cuDesenharFixos()">✕</button></div>`).join('');
+  cuTotFixos();
+}
+function cuTotFixos(){
+  const t=cuFixosEd.filter(f=>f.ativo!==false).reduce((s,f)=>s+cuN(f.valor),0);
+  const p=Math.max(1,cuN(document.getElementById('cp_pedidosMesEstimado')?.value||cuDados.config.pedidosMesEstimado));
+  document.getElementById('cuFixTot').textContent=cuBRL(t);document.getElementById('cuFixRat').textContent=cuBRL(t/p);
+}
+async function cuSalvarParams(btn){
+  const campos={};['pedidosMesEstimado','taxaPixPct','taxaCartaoPct','impostoPct','custoEntregaPorPedido','margemDesejadaPct'].forEach(k=>campos[k]=cuN(document.getElementById('cp_'+k).value));
+  const rest=setBtnLoading_(btn,'Salvando...');
+  const d=await apiPost('custoSalvarParametros',{fixos:cuFixosEd,campos}).catch(()=>({ok:false}));
+  if(rest)rest();
+  if(!d.ok){alert(d.erro||'Não foi possível salvar.');return;}
+  cuDados=d;cuFixosEd=d.fixos.map(f=>({...f}));cuRenderFixos();alert('Salvo!');
+}
+
+/* ---------- FINANCEIRO (dashboard) ---------- */
+let finF={preset:'30d',de:'',ate:'',agrupar:'dia'}, finDados=null;
+function finISO(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
+function finPeriodo(){
+  const h=new Date(),f=finF;let de=new Date(h),ate=new Date(h);
+  if(f.preset==='hoje'){}
+  else if(f.preset==='7d')de.setDate(h.getDate()-6);
+  else if(f.preset==='30d')de.setDate(h.getDate()-29);
+  else if(f.preset==='mes')de=new Date(h.getFullYear(),h.getMonth(),1);
+  else if(f.preset==='custom'&&f.de&&f.ate)return {de:f.de,ate:f.ate};
+  return {de:finISO(de),ate:finISO(ate)};
+}
+async function carregarFinanceiro(gravar){
+  const el=document.getElementById('tabFinanceiro');
+  if(!finDados) el.innerHTML='<div class="loading-note">Carregando…</div>';
+  const {de,ate}=finPeriodo();
+  const d=await apiPost('custoDashboard',{de,ate,agrupar:finF.agrupar,gravar:!!gravar}).catch(()=>({ok:false}));
+  if(!d.ok){el.innerHTML=`<div class="empty-note">${cuEsc(d.erro||'Não foi possível carregar. Atualize o Code.gs e gere uma nova implantação.')}</div>`;return;}
+  finDados=d;renderFinanceiro();
+  if(gravar)alert('Planilha atualizada! Veja as abas Margem_Pedidos e Margem_Resumo.');
+}
+function finSet(k,v){finF[k]=v;if(k==='preset'&&v!=='custom'){finDados=null;}carregarFinanceiro();}
+function finChart(serie){
+  if(!serie.length)return '<div class="empty-note">Sem pedidos no período.</div>';
+  const n=serie.length,bw=10,gap=6,gw=bw*3+gap+6,W=Math.max(320,n*gw+40),H=200,top=10,bot=34;
+  const maxV=Math.max(1,...serie.map(s=>Math.max(s.receita,s.custo,s.lucro))),minV=Math.min(0,...serie.map(s=>s.lucro));
+  const y=v=>top+(H-top-bot)*(1-(v-minV)/(maxV-minV));
+  const step=n>16?Math.ceil(n/12):1;
+  let g=`<line x1="30" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#211A0F" stroke-opacity=".3"/>`;
+  serie.forEach((s,i)=>{
+    const x=34+i*gw;
+    [[s.receita,'#F9B31A'],[s.custo,'#D31A1B'],[s.lucro,'#2E8B45']].forEach(([v,c],j)=>{
+      const y0=y(0),y1=y(v);g+=`<rect x="${x+j*bw}" y="${Math.min(y0,y1)}" width="${bw-1}" height="${Math.max(1,Math.abs(y0-y1))}" fill="${c}" rx="2"/>`;
+    });
+    if(i%step===0)g+=`<text x="${x+bw*1.5}" y="${H-16}" font-size="9" text-anchor="middle" fill="#211A0F">${cuEsc(s.label)}</text>`;
+  });
+  g+=`<text x="2" y="${y(maxV)+8}" font-size="9" fill="#211A0F">${Math.round(maxV)}</text>`;
+  return `<div style="overflow-x:auto;"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg></div>
+    <div style="font-size:.72rem;display:flex;gap:12px;margin-top:4px;"><span><i style="background:#F9B31A;display:inline-block;width:10px;height:10px;border-radius:2px"></i> Faturamento</span><span><i style="background:#D31A1B;display:inline-block;width:10px;height:10px;border-radius:2px"></i> Custo</span><span><i style="background:#2E8B45;display:inline-block;width:10px;height:10px;border-radius:2px"></i> Lucro</span></div>`;
+}
+function renderFinanceiro(){
+  const d=finDados,t=d.totais,el=document.getElementById('tabFinanceiro'),f=finF;
+  const pre=[['hoje','Hoje'],['7d','7 dias'],['30d','30 dias'],['mes','Este mês'],['custom','Período']].map(([k,l])=>`<button class="${f.preset===k?'on':''}" onclick="finSet('preset','${k}')">${l}</button>`).join('');
+  const agr=[['dia','Por dia'],['semana','Por semana'],['mes','Por mês']].map(([k,l])=>`<button class="${f.agrupar===k?'on':''}" onclick="finSet('agrupar','${k}')">${l}</button>`).join('');
+  const custom=f.preset==='custom'?`<div style="display:flex;gap:8px;margin-bottom:10px;max-width:420px;"><input class="cu-in" type="date" value="${f.de||d.de}" onchange="finF.de=this.value;finSet('preset','custom')"><input class="cu-in" type="date" value="${f.ate||d.ate}" onchange="finF.ate=this.value;finSet('preset','custom')"></div>`:'';
+  const comp=d.composicao,totC=Object.values(comp).reduce((a,b)=>a+b,0)||1;
+  const nomes={produtos:'Ingredientes e embalagens',entrega:'Entrega',taxas:'Taxas de pagamento',imposto:'Impostos',fixos:'Custos fixos (rateio)'};
+  const compHtml=Object.keys(comp).map(k=>`<div style="margin-bottom:8px;font-size:.8rem;"><div style="display:flex;justify-content:space-between;"><span>${nomes[k]}</span><b>${cuBRL(comp[k])} · ${(comp[k]/totC*100).toFixed(0)}%</b></div><div class="cu-bar" style="width:${Math.max(2,comp[k]/totC*100)}%"></div></div>`).join('');
+  const topHtml=d.top.map(p=>`<tr><td>${cuEsc(p.nome)}</td><td>${p.qtd}</td><td>${cuBRL(p.receita)}</td><td>${cuBRL(p.custo)}</td><td class="${p.lucro>=0?'cu-pos':'cu-neg'}">${cuBRL(p.lucro)}</td></tr>`).join('');
+  const alerta=t.semCusto?`<div class="cu-card" style="background:var(--dourado-pale);font-size:.82rem;">⚠️ ${t.semCusto} pedido(s) têm item sem custo cadastrado — o lucro deles está superestimado. Cadastre em <b>Custos → Calculadora</b>.</div>`:'';
+  el.innerHTML=CU_CSS+`<div class="cu-filtros">${pre}</div>${custom}<div class="cu-filtros">${agr}</div>${alerta}
+    <div class="cu-kpis"><div class="cu-kpi"><span>Faturamento</span><b>${cuBRL(t.receita)}</b></div><div class="cu-kpi"><span>Custo total</span><b>${cuBRL(t.custo)}</b></div>
+    <div class="cu-kpi"><span>Lucro</span><b class="${t.lucro>=0?'cu-pos':'cu-neg'}">${cuBRL(t.lucro)}</b></div><div class="cu-kpi"><span>Margem</span><b class="${t.margemPct>=0?'cu-pos':'cu-neg'}">${t.margemPct.toFixed(1)}%</b></div>
+    <div class="cu-kpi"><span>Pedidos</span><b>${t.pedidos}</b></div><div class="cu-kpi"><span>Ticket médio</span><b>${cuBRL(t.ticket)}</b></div></div>
+    <div class="cu-card"><h3>Evolução</h3>${finChart(d.serie)}</div>
+    <div class="cu-card"><h3>Para onde vai o custo</h3>${compHtml}</div>
+    <div class="cu-card"><h3>Produtos mais vendidos</h3><div style="overflow-x:auto;"><table class="cu-tbl"><tr><th>Item</th><th>Qtd</th><th>Receita</th><th>Custo</th><th>Lucro</th></tr>${topHtml||'<tr><td colspan="5">Sem dados</td></tr>'}</table></div></div>
+    <button class="cu-btn sec" style="max-width:760px;width:100%;" onclick="carregarFinanceiro(true)">📄 Gravar balanço na planilha</button>
+    <p style="font-size:.7rem;opacity:.55;margin-top:8px;max-width:760px;">Conta só pedidos aceitos em diante. Lucro = total pago − ingredientes − entrega − taxas − impostos − rateio dos custos fixos.</p>`;
 }
 
 /* ---------- início ---------- */
