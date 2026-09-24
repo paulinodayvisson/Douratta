@@ -232,8 +232,8 @@ table td.mono{font-family:var(--font-mono);}
       Cardápio
     </button>
     <button class="tab-btn" data-tab="cacaniquel" onclick="mudarAba('cacaniquel')">
-      <span class="material-symbols-outlined">casino</span>
-      Caça-Níquel
+      <span class="material-symbols-outlined">redeem</span>
+      Giro Premiado
     </button>
     <button class="tab-btn" data-tab="configuracoes" onclick="mudarAba('configuracoes')">
       <span class="material-symbols-outlined">settings</span>
@@ -868,8 +868,8 @@ function renderCacaNiquel(){
   const seqHtml = seq.map((l,i)=>`<span style="display:inline-block;padding:2px 3px;border-radius:6px;${i+1===cacaCache.posicao?'background:var(--dourado,#F9B31A);':''}">${CACA_ICONES[l]||l}</span>`).join('');
   el.innerHTML = `<style>.caca-in{width:100%;padding:9px 10px;border:1.5px solid rgba(33,26,15,.2);border-radius:10px;font-size:.9rem;margin:4px 0 12px;background:#fff;}.caca-lb{font-size:.78rem;font-weight:700;display:block;}.caca-dias label{display:inline-flex;align-items:center;gap:3px;margin:0 8px 6px 0;font-size:.82rem;font-weight:600;}</style>
     <div class="config-card">
-      <h3>Caça-Níquel 🎰</h3>
-      <p class="sub">Quando ligado, o botão de enviar pedido abre a máquina antes de ir pro WhatsApp. O prêmio já entra no pedido.</p>
+      <h3>Giro Premiado 🎁</h3>
+      <p class="sub">Quando ligado, o botão de enviar pedido abre a roleta de prêmios antes de ir pro WhatsApp. O prêmio já entra no pedido.</p>
       <div class="loja-toggle-row">
         <span class="loja-toggle-label ${!c.ativa?'ativo':''}">Desligado</span>
         <button class="loja-toggle ${c.ativa?'on':''}" id="btnToggleCaca" onclick="alternarCaca()" role="switch" aria-checked="${c.ativa}">
