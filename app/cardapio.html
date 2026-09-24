@@ -813,7 +813,7 @@ footer.brand-footer .fs{font-size:0.72rem;color:var(--carvao-soft);opacity:0.4;m
 .btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.45);border-top-color:#fff;border-radius:50%;animation:girarSpinner .6s linear infinite;vertical-align:-2px;margin-right:7px;}
 @keyframes girarSpinner{to{transform:rotate(360deg);}}
 
-/* ===== CAÇA-NÍQUEL ===== */
+/* ===== GIRO PREMIADO ===== */
 .cn-overlay{position:fixed;inset:0;z-index:99999;background:rgba(20,14,6,.82);display:none;align-items:center;justify-content:center;padding:16px;}
 .cn-overlay.show{display:flex;}
 .cn-box{width:100%;max-width:380px;background:linear-gradient(180deg,#7a0f10,#D31A1B);border:4px solid var(--dourado);border-radius:24px;padding:20px 16px 18px;text-align:center;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);}
@@ -830,6 +830,15 @@ footer.brand-footer .fs{font-size:0.72rem;color:var(--carvao-soft);opacity:0.4;m
 .cn-btn.verde{background:#2E8B45;color:#fff;}
 .cn-prize{margin:12px 0 4px;font-size:1.15rem;font-weight:800;color:var(--dourado);}
 .cn-prize small{display:block;color:#fff;font-weight:500;font-size:.8rem;margin-top:2px;}
+
+.cn-box{position:relative;overflow:hidden;}
+.cn-box::before{content:'';position:absolute;inset:5px;border:4px dotted #fff;border-radius:19px;pointer-events:none;animation:cnBulbs 1s steps(1) infinite;}
+.cn-box.win::before{animation-duration:.25s;}
+@keyframes cnBulbs{0%{border-color:#fff}50%{border-color:var(--dourado)}100%{border-color:#fff}}
+.cn-conf{position:fixed;top:-20px;width:10px;height:14px;z-index:100000;pointer-events:none;animation:cnFall linear forwards;}
+@keyframes cnFall{to{transform:translateY(110vh) rotate(720deg);opacity:.9;}}
+.cn-prize{animation:cnPop .5s cubic-bezier(.2,1.6,.4,1);}
+@keyframes cnPop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 </style>
 </head>
 <body>
@@ -987,8 +996,8 @@ footer.brand-footer .fs{font-size:0.72rem;color:var(--carvao-soft);opacity:0.4;m
 
 <div class="cn-overlay" id="cnOverlay">
   <div class="cn-box">
-    <div class="cn-title">🎰 CAÇA-NÍQUEL DOURATTA</div>
-    <div class="cn-sub" id="cnSub">Gire e ganhe um prêmio no seu pedido!</div>
+    <div class="cn-title">🎁 GIRO PREMIADO DOURATTA</div>
+    <div class="cn-sub" id="cnSub">Todo pedido ganha! Gire e descubra seu prêmio.</div>
     <div class="cn-reels" id="cnReels"><div class="cn-reel">🍕</div><div class="cn-reel">🍕</div><div class="cn-reel">🍕</div></div>
     <div class="cn-tries" id="cnTries">Você tem 3 giros</div>
     <div class="cn-prize" id="cnPrize" style="display:none;"></div>
@@ -2994,8 +3003,8 @@ function pickOtherDrink(){
 
 
 /* =========================================================
-   CAÇA-NÍQUEL — máquina antes do envio pro WhatsApp.
-   O prêmio vem do backend (fila na aba "Caca Niquel"); aqui só
+   GIRO PREMIADO — máquina antes do envio pro WhatsApp.
+   O prêmio vem do backend (fila na aba "Giro Premiado"); aqui só
    sorteamos EM QUAL das 3 tentativas ele aparece.
    ========================================================= */
 const CN_SIMBOLOS = ['🍕','🥤','🍰','🛵','🏷️','🍒','⭐','7️⃣'];
@@ -3014,7 +3023,8 @@ async function cnAbrir(){
   ov.classList.add('show');
   document.getElementById('cnPrize').style.display='none';
   document.getElementById('cnReels').classList.remove('win');
-  document.getElementById('cnSub').textContent = 'Preparando a máquina…';
+  document.querySelector('.cn-box').classList.remove('win');
+  document.getElementById('cnSub').textContent = 'Preparando seu prêmio…';
   document.getElementById('cnTries').textContent = '';
   btn.disabled = true; btn.className='cn-btn'; btn.textContent='AGUARDE…';
   let data = null;
@@ -3026,8 +3036,8 @@ async function cnAbrir(){
   }catch(e){}
   if(!data || !data.ok){ cnLiberar(null); return; } // falhou/inativo: segue pedido normal
   cnEstado = { res:data, giro:0, vence:1+Math.floor(Math.random()*3), girando:false };
-  document.getElementById('cnSub').textContent = 'Gire e ganhe um prêmio no seu pedido!';
-  document.getElementById('cnTries').textContent = 'Você tem 3 giros — o prêmio pode sair em qualquer um!';
+  document.getElementById('cnSub').textContent = 'Todo pedido ganha! Gire e descubra seu prêmio.';
+  document.getElementById('cnTries').textContent = 'Você tem 3 giros — seu prêmio pode sair em qualquer um!';
   btn.disabled=false; btn.textContent='GIRAR (1/3)';
 }
 function cnSimboloPremio(p){ return p.tipo==='produto' ? CN_ICONE[p.slot] : CN_ICONE[p.tipo]; }
@@ -3055,16 +3065,31 @@ function cnGirar(){
       if(i===2) cnFimGiro(ganhou); }, 900+i*450);
   });
 }
+
+function cnConfete(){
+  const cores=['#F9B31A','#D31A1B','#2E8B45','#fff','#FF7A00','#3BA7FF'];
+  for(let i=0;i<90;i++){
+    const d=document.createElement('div'); d.className='cn-conf';
+    d.style.left=Math.random()*100+'vw';
+    d.style.background=cores[i%cores.length];
+    d.style.borderRadius=Math.random()<.4?'50%':'2px';
+    d.style.animationDuration=(1.8+Math.random()*2)+'s';
+    d.style.animationDelay=(Math.random()*.8)+'s';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(),4800);
+  }
+}
 function cnFimGiro(ganhou){
   const st = cnEstado, btn = document.getElementById('cnBtn');
   st.girando = false;
   if(ganhou){
     document.getElementById('cnReels').classList.add('win');
+    document.querySelector('.cn-box').classList.add('win'); cnConfete(); setTimeout(cnConfete,1400);
     const pz = document.getElementById('cnPrize');
     pz.style.display='block';
-    pz.innerHTML = `🎉 VOCÊ GANHOU!<br>${cnTextoPremio(st.res.premio)}<small>O prêmio já vai no seu pedido.</small>`;
+    pz.innerHTML = `🎉 PARABÉNS, VOCÊ GANHOU!<br>${cnTextoPremio(st.res.premio)}<small>Seu prêmio já foi adicionado ao pedido!</small>`;
     document.getElementById('cnTries').textContent='';
-    btn.disabled=false; btn.className='cn-btn verde'; btn.textContent='ENVIAR PEDIDO NO WHATSAPP';
+    btn.disabled=false; btn.className='cn-btn verde'; btn.textContent='RESGATAR E ENVIAR PEDIDO';
     btn.onclick = ()=>{ btn.onclick=cnGirar; cnLiberar({premio:st.res.premio, logId:st.res.logId}); };
   } else {
     const resta = 3-st.giro;
@@ -3091,7 +3116,7 @@ async function sendOrder(){
     if(el) el.style.borderColor = 'var(--dourado)';
     return;
   }
-  // CAÇA-NÍQUEL: se ativo, o envio pro WhatsApp passa antes pela máquina.
+  // GIRO PREMIADO: se ativo, o envio pro WhatsApp passa antes pela máquina.
   if(CACA && CACA.ativa && !window.__cacaLiberado_){ cnAbrir(); return; }
   const caca = window.__cacaLiberado_ ? window.__cacaRes_ : null;
   window.__cacaLiberado_ = false; window.__cacaRes_ = null;
@@ -3173,17 +3198,17 @@ async function sendOrder(){
 
   if(cacaBrinde){
     lines.push('');
-    lines.push(`🎰 *BRINDE CAÇA-NÍQUEL:* 1x ${cacaBrinde.tamanho?cacaBrinde.tamanho+' — ':''}${cacaBrinde.nome} — R$ 0,00 _(ganho na máquina!)_`);
+    lines.push(`🎰 *BRINDE GIRO PREMIADO:* 1x ${cacaBrinde.tamanho?cacaBrinde.tamanho+' — ':''}${cacaBrinde.nome} — R$ 0,00 _(ganho no Giro Premiado!)_`);
   }
   lines.push('');
   lines.push('▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬');
   lines.push(`Subtotal: ${formatBRL(sub)}`);
-  if(cacaDesc>0) lines.push(`🎰 Prêmio Caça-Níquel (${cacaP.pct}% de desconto): -${formatBRL(cacaDesc)}`);
+  if(cacaDesc>0) lines.push(`🎰 Prêmio Giro Premiado (${cacaP.pct}% de desconto): -${formatBRL(cacaDesc)}`);
   if(coinsToRedeem>0){
     lines.push(`${MOEDA.nome}s usadas _(confirmar com o cliente)_: ${coinsToRedeem} = -${formatBRL(coinsDiscount)}`);
   }
   if(delivery.status==='ok'){
-    lines.push(`Entrega: ${deliveryFeeFinal>0?formatBRL(deliveryFeeFinal):'Grátis'}${cacaFrete?' 🎰 _(FRETE GRÁTIS ganho no Caça-Níquel)_':''} (${customerData.neighborhood})`);
+    lines.push(`Entrega: ${deliveryFeeFinal>0?formatBRL(deliveryFeeFinal):'Grátis'}${cacaFrete?' 🎰 _(FRETE GRÁTIS ganho no Giro Premiado)_':''} (${customerData.neighborhood})`);
   } else {
     lines.push('Entrega: a calcular');
   }
@@ -3228,14 +3253,14 @@ async function sendOrder(){
   if(cacaBrinde){
     if(cacaBrinde.kind==='pizza'){
       itensPedido.push({ tipo:'pizza', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, tamanho:cacaBrinde.tamanho||'',
-        sabores:[{nome:cacaBrinde.nome, removidos:[], adicionados:[]}], borda:'', obs:'BRINDE CAÇA-NÍQUEL', valor:0, resgatado:false, custoMoedas:0 });
+        sabores:[{nome:cacaBrinde.nome, removidos:[], adicionados:[]}], borda:'', obs:'BRINDE GIRO PREMIADO', valor:0, resgatado:false, custoMoedas:0 });
     } else if(cacaBrinde.kind==='bebida'){
       itensPedido.push({ tipo:'bebida', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, valor:0 });
     } else {
-      itensPedido.push({ tipo:'simples', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, removidos:[], adicionados:[], borda:'', obs:'BRINDE CAÇA-NÍQUEL', valor:0, resgatado:false, custoMoedas:0 });
+      itensPedido.push({ tipo:'simples', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, removidos:[], adicionados:[], borda:'', obs:'BRINDE GIRO PREMIADO', valor:0, resgatado:false, custoMoedas:0 });
     }
   }
-  if(cacaFrete) itensPedido.push({ tipo:'simples', nome:'🎰 FRETE GRÁTIS (Caça-Níquel)', qty:1, removidos:[], adicionados:[], borda:'', obs:'', valor:0, resgatado:false, custoMoedas:0 });
+  if(cacaFrete) itensPedido.push({ tipo:'simples', nome:'🎰 FRETE GRÁTIS (Giro Premiado)', qty:1, removidos:[], adicionados:[], borda:'', obs:'', valor:0, resgatado:false, custoMoedas:0 });
 
   saveCustomerProfile();
 
