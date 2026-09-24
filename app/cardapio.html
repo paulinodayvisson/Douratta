@@ -812,6 +812,24 @@ footer.brand-footer .fh{font-family:var(--font-display);font-style:italic;font-s
 footer.brand-footer .fs{font-size:0.72rem;color:var(--carvao-soft);opacity:0.4;margin-top:6px;font-family:var(--font-mono);}
 .btn-spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.45);border-top-color:#fff;border-radius:50%;animation:girarSpinner .6s linear infinite;vertical-align:-2px;margin-right:7px;}
 @keyframes girarSpinner{to{transform:rotate(360deg);}}
+
+/* ===== CAÇA-NÍQUEL ===== */
+.cn-overlay{position:fixed;inset:0;z-index:99999;background:rgba(20,14,6,.82);display:none;align-items:center;justify-content:center;padding:16px;}
+.cn-overlay.show{display:flex;}
+.cn-box{width:100%;max-width:380px;background:linear-gradient(180deg,#7a0f10,#D31A1B);border:4px solid var(--dourado);border-radius:24px;padding:20px 16px 18px;text-align:center;color:#fff;box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.cn-title{font-family:var(--font-display,inherit);font-size:1.5rem;font-weight:800;color:var(--dourado);letter-spacing:.5px;}
+.cn-sub{font-size:.85rem;opacity:.9;margin:4px 0 14px;}
+.cn-reels{display:flex;gap:8px;justify-content:center;background:#211A0F;padding:12px;border-radius:16px;border:3px solid var(--dourado);}
+.cn-reel{width:30%;height:88px;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;overflow:hidden;}
+.cn-reel.spin{filter:blur(2px);}
+.cn-reels.win{animation:cnGlow .6s ease-in-out infinite alternate;}
+@keyframes cnGlow{from{box-shadow:0 0 6px var(--dourado);}to{box-shadow:0 0 28px 8px var(--dourado);}}
+.cn-tries{margin:12px 0 10px;font-weight:700;font-size:.9rem;}
+.cn-btn{width:100%;padding:15px;border-radius:99px;background:var(--dourado);color:#211A0F;font-weight:800;font-size:1.05rem;border:0;cursor:pointer;}
+.cn-btn[disabled]{opacity:.55;cursor:default;}
+.cn-btn.verde{background:#2E8B45;color:#fff;}
+.cn-prize{margin:12px 0 4px;font-size:1.15rem;font-weight:800;color:var(--dourado);}
+.cn-prize small{display:block;color:#fff;font-weight:500;font-size:.8rem;margin-top:2px;}
 </style>
 </head>
 <body>
@@ -966,6 +984,17 @@ footer.brand-footer .fs{font-size:0.72rem;color:var(--carvao-soft);opacity:0.4;m
 <!-- =========================================================
      MODAL DE SUGESTÃO DE BEBIDA (ao fechar pedido sem bebida)
      ========================================================= -->
+
+<div class="cn-overlay" id="cnOverlay">
+  <div class="cn-box">
+    <div class="cn-title">🎰 CAÇA-NÍQUEL DOURATTA</div>
+    <div class="cn-sub" id="cnSub">Gire e ganhe um prêmio no seu pedido!</div>
+    <div class="cn-reels" id="cnReels"><div class="cn-reel">🍕</div><div class="cn-reel">🍕</div><div class="cn-reel">🍕</div></div>
+    <div class="cn-tries" id="cnTries">Você tem 3 giros</div>
+    <div class="cn-prize" id="cnPrize" style="display:none;"></div>
+    <button class="cn-btn" id="cnBtn" onclick="cnGirar()">GIRAR</button>
+  </div>
+</div>
 <div class="ds-overlay" id="drinkSuggestOverlay" onclick="if(event.target===this) closeDrinkSuggestModal()">
   <div class="ds-card" id="drinkSuggestBody"></div>
 </div>
@@ -1078,6 +1107,7 @@ function linkAcompanhamento_(id){
    CONFIG — vem da aba "Config" da planilha (valores abaixo
    são apenas um fallback caso o carregamento falhe)
    ========================================================= */
+let CACA = { ativa:false };
 let CONFIG = {
   whatsappNumber: '5531999999999',
   pizzeriaAddress: 'Rua Exemplo, 123 - Centro, Sete Lagoas - MG',
@@ -1307,6 +1337,7 @@ async function loadMenuData(){
     DRINKS = data.DRINKS || [];
     CATS = data.CATS || [];
     NEIGHBORHOODS = data.NEIGHBORHOODS || [];
+    if(data.CACA) CACA = data.CACA;
     if(data.MOEDA) MOEDA = Object.assign(MOEDA, data.MOEDA);
     updateCoinIconEl();
     // Pizza aceita no máximo 2 sabores — mesmo que a planilha traga mais
@@ -2961,6 +2992,87 @@ function pickOtherDrink(){
   closeScreen('screenCart');
 }
 
+
+/* =========================================================
+   CAÇA-NÍQUEL — máquina antes do envio pro WhatsApp.
+   O prêmio vem do backend (fila na aba "Caca Niquel"); aqui só
+   sorteamos EM QUAL das 3 tentativas ele aparece.
+   ========================================================= */
+const CN_SIMBOLOS = ['🍕','🥤','🍰','🛵','🏷️','🍒','⭐','7️⃣'];
+const CN_ICONE = { desconto:'🏷️', frete:'🛵', refri:'🥤', sobremesa:'🍰', pizza:'🍕' };
+let cnEstado = null;
+function cnRand(a){ return a[Math.floor(Math.random()*a.length)]; }
+function cnLiberar(res){
+  document.getElementById('cnOverlay').classList.remove('show');
+  window.__cacaRes_ = res || null;
+  window.__cacaLiberado_ = true;
+  sendOrder();
+}
+async function cnAbrir(){
+  const ov = document.getElementById('cnOverlay');
+  const btn = document.getElementById('cnBtn');
+  ov.classList.add('show');
+  document.getElementById('cnPrize').style.display='none';
+  document.getElementById('cnReels').classList.remove('win');
+  document.getElementById('cnSub').textContent = 'Preparando a máquina…';
+  document.getElementById('cnTries').textContent = '';
+  btn.disabled = true; btn.className='cn-btn'; btn.textContent='AGUARDE…';
+  let data = null;
+  try{
+    const r = await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({acao:'cacaSortear',telefone:normalizePhone(customerData.phone),nome:customerData.name,
+        frete: delivery.status==='ok'?delivery.fee:0})});
+    data = await r.json();
+  }catch(e){}
+  if(!data || !data.ok){ cnLiberar(null); return; } // falhou/inativo: segue pedido normal
+  cnEstado = { res:data, giro:0, vence:1+Math.floor(Math.random()*3), girando:false };
+  document.getElementById('cnSub').textContent = 'Gire e ganhe um prêmio no seu pedido!';
+  document.getElementById('cnTries').textContent = 'Você tem 3 giros — o prêmio pode sair em qualquer um!';
+  btn.disabled=false; btn.textContent='GIRAR (1/3)';
+}
+function cnSimboloPremio(p){ return p.tipo==='produto' ? CN_ICONE[p.slot] : CN_ICONE[p.tipo]; }
+function cnTextoPremio(p){
+  if(p.tipo==='desconto') return `${p.pct}% DE DESCONTO`;
+  if(p.tipo==='frete') return 'FRETE GRÁTIS';
+  return (p.tamanho?p.tamanho+' — ':'')+p.nome.toUpperCase();
+}
+function cnGirar(){
+  const st = cnEstado; if(!st || st.girando) return;
+  st.girando = true; st.giro++;
+  const btn = document.getElementById('cnBtn');
+  btn.disabled = true; btn.textContent='GIRANDO…';
+  const reels = [...document.querySelectorAll('#cnReels .cn-reel')];
+  const ganhou = st.giro === st.vence;
+  let alvo;
+  if(ganhou){ const s = cnSimboloPremio(st.res.premio); alvo=[s,s,s]; }
+  else {
+    do{ alvo=[cnRand(CN_SIMBOLOS),cnRand(CN_SIMBOLOS),cnRand(CN_SIMBOLOS)]; }while(alvo[0]===alvo[1]&&alvo[1]===alvo[2]);
+  }
+  reels.forEach((el,i)=>{
+    el.classList.add('spin');
+    const iv = setInterval(()=>{ el.textContent = cnRand(CN_SIMBOLOS); },70);
+    setTimeout(()=>{ clearInterval(iv); el.classList.remove('spin'); el.textContent = alvo[i];
+      if(i===2) cnFimGiro(ganhou); }, 900+i*450);
+  });
+}
+function cnFimGiro(ganhou){
+  const st = cnEstado, btn = document.getElementById('cnBtn');
+  st.girando = false;
+  if(ganhou){
+    document.getElementById('cnReels').classList.add('win');
+    const pz = document.getElementById('cnPrize');
+    pz.style.display='block';
+    pz.innerHTML = `🎉 VOCÊ GANHOU!<br>${cnTextoPremio(st.res.premio)}<small>O prêmio já vai no seu pedido.</small>`;
+    document.getElementById('cnTries').textContent='';
+    btn.disabled=false; btn.className='cn-btn verde'; btn.textContent='ENVIAR PEDIDO NO WHATSAPP';
+    btn.onclick = ()=>{ btn.onclick=cnGirar; cnLiberar({premio:st.res.premio, logId:st.res.logId}); };
+  } else {
+    const resta = 3-st.giro;
+    document.getElementById('cnTries').textContent = `Quase! Restam ${resta} giro${resta>1?'s':''}…`;
+    btn.disabled=false; btn.textContent=`GIRAR (${st.giro+1}/3)`;
+  }
+}
+
 async function sendOrder(){
   const sendBtn = document.getElementById('sendOrderBtn');
   if(sendBtn && sendBtn.dataset.travado==='1') return; // trava contra clique duplo
@@ -2979,13 +3091,21 @@ async function sendOrder(){
     if(el) el.style.borderColor = 'var(--dourado)';
     return;
   }
+  // CAÇA-NÍQUEL: se ativo, o envio pro WhatsApp passa antes pela máquina.
+  if(CACA && CACA.ativa && !window.__cacaLiberado_){ cnAbrir(); return; }
+  const caca = window.__cacaLiberado_ ? window.__cacaRes_ : null;
+  window.__cacaLiberado_ = false; window.__cacaRes_ = null;
   const destravarEnvio_ = sendBtn ? travarBotaoComEtapas_(sendBtn, ['Revisando pedido…','Registrando pedido…','Finalizando pedido…','Gerando acompanhamento…']) : null;
 
   const crustLabel = id => CRUSTS.find(c=>c.id===id)?.name;
   const sub = cartSubtotal();
-  const deliveryFeeFinal = delivery.status==='ok' ? delivery.fee : 0;
+  const cacaP = caca && caca.premio ? caca.premio : null;
+  const cacaFrete = !!(cacaP && cacaP.tipo==='frete');
+  const deliveryFeeFinal = cacaFrete ? 0 : (delivery.status==='ok' ? delivery.fee : 0);
   const coinsDiscount = coinsDiscountReais();
-  const total = Math.max(0, sub + deliveryFeeFinal - CONFIG.discount - coinsDiscount);
+  const cacaDesc = (cacaP && cacaP.tipo==='desconto') ? Math.round(sub*cacaP.pct)/100 : 0;
+  const cacaBrinde = (cacaP && cacaP.tipo==='produto') ? cacaP : null;
+  const total = Math.max(0, sub + deliveryFeeFinal - CONFIG.discount - coinsDiscount - cacaDesc);
 
   let lines = [];
   lines.push('🍕 *NOVO PEDIDO — DOURATTA PIZZARIA*');
@@ -3051,14 +3171,19 @@ async function sendOrder(){
     });
   }
 
+  if(cacaBrinde){
+    lines.push('');
+    lines.push(`🎰 *BRINDE CAÇA-NÍQUEL:* 1x ${cacaBrinde.tamanho?cacaBrinde.tamanho+' — ':''}${cacaBrinde.nome} — R$ 0,00 _(ganho na máquina!)_`);
+  }
   lines.push('');
   lines.push('▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬');
   lines.push(`Subtotal: ${formatBRL(sub)}`);
+  if(cacaDesc>0) lines.push(`🎰 Prêmio Caça-Níquel (${cacaP.pct}% de desconto): -${formatBRL(cacaDesc)}`);
   if(coinsToRedeem>0){
     lines.push(`${MOEDA.nome}s usadas _(confirmar com o cliente)_: ${coinsToRedeem} = -${formatBRL(coinsDiscount)}`);
   }
   if(delivery.status==='ok'){
-    lines.push(`Entrega: ${delivery.fee>0?formatBRL(delivery.fee):'Grátis'} (${customerData.neighborhood})`);
+    lines.push(`Entrega: ${deliveryFeeFinal>0?formatBRL(deliveryFeeFinal):'Grátis'}${cacaFrete?' 🎰 _(FRETE GRÁTIS ganho no Caça-Níquel)_':''} (${customerData.neighborhood})`);
   } else {
     lines.push('Entrega: a calcular');
   }
@@ -3100,6 +3225,18 @@ async function sendOrder(){
     });
   }
 
+  if(cacaBrinde){
+    if(cacaBrinde.kind==='pizza'){
+      itensPedido.push({ tipo:'pizza', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, tamanho:cacaBrinde.tamanho||'',
+        sabores:[{nome:cacaBrinde.nome, removidos:[], adicionados:[]}], borda:'', obs:'BRINDE CAÇA-NÍQUEL', valor:0, resgatado:false, custoMoedas:0 });
+    } else if(cacaBrinde.kind==='bebida'){
+      itensPedido.push({ tipo:'bebida', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, valor:0 });
+    } else {
+      itensPedido.push({ tipo:'simples', nome:'🎰 BRINDE: '+cacaBrinde.nome, qty:1, removidos:[], adicionados:[], borda:'', obs:'BRINDE CAÇA-NÍQUEL', valor:0, resgatado:false, custoMoedas:0 });
+    }
+  }
+  if(cacaFrete) itensPedido.push({ tipo:'simples', nome:'🎰 FRETE GRÁTIS (Caça-Níquel)', qty:1, removidos:[], adicionados:[], borda:'', obs:'', valor:0, resgatado:false, custoMoedas:0 });
+
   saveCustomerProfile();
 
   // Registra o pedido no painel do administrador (aba "Pedidos") — é o
@@ -3118,13 +3255,17 @@ async function sendOrder(){
         endereco: `${customerData.address}, ${customerData.number}${customerData.complement?' - '+customerData.complement:''} — ${customerData.neighborhood} — ${CONFIG.cidadeEntrega} - ${CONFIG.estadoEntrega}${customerData.reference?' (Ref.: '+customerData.reference+')':''}`,
         formaPagamento: customerData.payment==='pix'?'Pix':customerData.payment==='dinheiro'?'Dinheiro':'Cartão',
         trocoPara: customerData.payment==='dinheiro' ? (customerData.change||'') : '',
-        subtotal: sub, frete: deliveryFeeFinal, desconto: CONFIG.discount + coinsDiscount,
+        subtotal: sub, frete: deliveryFeeFinal, desconto: CONFIG.discount + coinsDiscount + cacaDesc,
         moedasUsadas: coinsToRedeem||0,
         total, itens: itensPedido
       })
     });
     const dataCriar = await respCriar.json().catch(()=>({}));
     if(dataCriar && dataCriar.ok) pedidoIdCriado = dataCriar.id;
+    if(dataCriar && dataCriar.ok && caca && caca.logId){
+      fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body:JSON.stringify({acao:'cacaConfirmar',logId:caca.logId,pedidoId:dataCriar.id})}).catch(()=>{});
+    }
   } catch(e){ /* segue o pedido mesmo se o painel falhar */ }
 
   // Registra a pontuação (compra própria + indicação + moedas usadas como
