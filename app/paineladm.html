@@ -231,6 +231,10 @@ table td.mono{font-family:var(--font-mono);}
       <span class="material-symbols-outlined">restaurant_menu</span>
       Cardápio
     </button>
+    <button class="tab-btn" data-tab="cacaniquel" onclick="mudarAba('cacaniquel')">
+      <span class="material-symbols-outlined">casino</span>
+      Caça-Níquel
+    </button>
     <button class="tab-btn" data-tab="configuracoes" onclick="mudarAba('configuracoes')">
       <span class="material-symbols-outlined">settings</span>
       Configurações
@@ -247,6 +251,7 @@ table td.mono{font-family:var(--font-mono);}
     <div class="tab-panel" id="tabChecklist"><div class="loading-note">Carregando checklist…</div></div>
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
+    <div class="tab-panel" id="tabCacaniquel"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabConfiguracoes"><div class="loading-note">Carregando configurações…</div></div>
   </div>
 </div>
@@ -503,6 +508,7 @@ function mudarAba(nome){
   if(nome==='cardapio') carregarCardapio();
   if(nome==='checklist') renderChecklist();
   if(nome==='configuracoes') carregarConfiguracoes();
+  if(nome==='cacaniquel') carregarCacaNiquel();
 }
 
 /* ---------- ciclo de atualização (pedidos) ---------- */
@@ -826,6 +832,118 @@ async function alternarStatusLoja(){
   if(!data.ok){ alert(data.erro || 'Não foi possível atualizar agora.'); return; }
   configCache.aberto = typeof data.aberto === 'boolean' ? data.aberto : novoValor;
   renderConfiguracoes();
+}
+
+
+/* ---------- ABA CAÇA-NÍQUEL ---------- */
+let cacaCache = null, cacaProdutos = { MENU:{}, CATS:[] };
+const CACA_DIAS = [['dom','Dom'],['seg','Seg'],['ter','Ter'],['qua','Qua'],['qui','Qui'],['sex','Sex'],['sab','Sáb']];
+const CACA_ICONES = { D:'🏷️', F:'🛵', R:'🥤', S:'🍰', P:'🍕' };
+async function carregarCacaNiquel(){
+  const el = document.getElementById('tabCacaniquel');
+  el.innerHTML = '<div class="loading-note">Carregando…</div>';
+  const [d, p] = await Promise.all([
+    apiPost('cacaObterConfig', {}).catch(()=>({ok:false})),
+    apiPost('listarProdutosAdmin', {}).catch(()=>({ok:false}))
+  ]);
+  if(!d.ok){ el.innerHTML = `<div class="empty-note">${d.erro||'Não foi possível carregar agora. (Lembre de atualizar o Code.gs e gerar nova implantação.)'}</div>`; return; }
+  cacaCache = d;
+  if(p.ok) cacaProdutos = { MENU:p.MENU||{}, CATS:p.CATS||[] };
+  renderCacaNiquel();
+}
+function cacaSelectProduto_(id, atual){
+  const grupos = cacaProdutos.CATS.map(cat=>{
+    const itens = cacaProdutos.MENU[cat.id]||[];
+    if(!itens.length) return '';
+    return `<optgroup label="${cat.label||cat.id}">${itens.map(p=>`<option value="${p.id}" ${p.id===atual?'selected':''}>${p.name}${p.ativo===false?' (inativo)':''}</option>`).join('')}</optgroup>`;
+  }).join('');
+  return `<select id="${id}" class="caca-in"><option value="">— nenhum (vira desconto) —</option>${grupos}</select>`;
+}
+function renderCacaNiquel(){
+  const el = document.getElementById('tabCacaniquel');
+  const c = cacaCache.config;
+  const todos = String(c.diasSemana).trim().toLowerCase()==='todos' || !String(c.diasSemana).trim();
+  const dias = todos ? CACA_DIAS.map(d=>d[0]) : String(c.diasSemana).toLowerCase().split(/[\s,;]+/).map(x=>x.slice(0,3));
+  const seq = cacaCache.sequencia.split('');
+  const seqHtml = seq.map((l,i)=>`<span style="display:inline-block;padding:2px 3px;border-radius:6px;${i+1===cacaCache.posicao?'background:var(--dourado,#F9B31A);':''}">${CACA_ICONES[l]||l}</span>`).join('');
+  el.innerHTML = `<style>.caca-in{width:100%;padding:9px 10px;border:1.5px solid rgba(33,26,15,.2);border-radius:10px;font-size:.9rem;margin:4px 0 12px;background:#fff;}.caca-lb{font-size:.78rem;font-weight:700;display:block;}.caca-dias label{display:inline-flex;align-items:center;gap:3px;margin:0 8px 6px 0;font-size:.82rem;font-weight:600;}</style>
+    <div class="config-card">
+      <h3>Caça-Níquel 🎰</h3>
+      <p class="sub">Quando ligado, o botão de enviar pedido abre a máquina antes de ir pro WhatsApp. O prêmio já entra no pedido.</p>
+      <div class="loja-toggle-row">
+        <span class="loja-toggle-label ${!c.ativa?'ativo':''}">Desligado</span>
+        <button class="loja-toggle ${c.ativa?'on':''}" id="btnToggleCaca" onclick="alternarCaca()" role="switch" aria-checked="${c.ativa}">
+          <span class="loja-toggle-knob"></span>
+        </button>
+        <span class="loja-toggle-label ${c.ativa?'ativo':''}">Ligado</span>
+      </div>
+      <p class="sub" style="margin-top:12px;text-align:center;">${c.ativa ? (cacaCache.hojeAtiva?'✅ Aparecendo pros clientes hoje.':'⏸️ Ligado, mas hoje não é um dos dias escolhidos.') : 'Não aparece pros clientes.'}</p>
+
+      <div style="margin-top:18px;">
+        <span class="caca-lb">Dias da semana em que aparece</span>
+        <div class="caca-dias" style="margin:6px 0 10px;">
+          <label><input type="checkbox" id="cdTodos" ${todos?'checked':''} onchange="document.querySelectorAll('.cd-dia').forEach(x=>x.checked=this.checked)"> Todos</label>
+          ${CACA_DIAS.map(([k,l])=>`<label><input type="checkbox" class="cd-dia" value="${k}" ${dias.includes(k)?'checked':''} onchange="document.getElementById('cdTodos').checked=false"> ${l}</label>`).join('')}
+        </div>
+
+        <label class="caca-lb">% de desconto do prêmio</label>
+        <input class="caca-in" type="number" min="1" max="100" id="ccDesc" value="${c.descontoPct}">
+
+        <label class="caca-lb">Frete grátis só se o frete for até (R$)</label>
+        <input class="caca-in" type="number" min="0" step="0.5" id="ccFrete" value="${c.freteGratisMax}">
+
+        <label class="caca-lb">Refrigerante (prêmio)</label>
+        ${cacaSelectProduto_('ccRefri', c.produtoRefriId)}
+        <label class="caca-lb">Sobremesa (prêmio)</label>
+        ${cacaSelectProduto_('ccSobremesa', c.produtoSobremesaId)}
+        <label class="caca-lb">Pizza (prêmio)</label>
+        ${cacaSelectProduto_('ccPizza', c.produtoPizzaId)}
+
+        <label class="caca-lb">Tamanho da pizza-prêmio</label>
+        <input class="caca-in" id="ccTamPizza" value="${c.tamanhoPizza}">
+        <label class="caca-lb">Tamanho da sobremesa (se for pizza doce)</label>
+        <input class="caca-in" id="ccTamSobremesa" value="${c.tamanhoSobremesa}">
+
+        <label class="caca-lb">Pedidos com desconto antes de cada brinde</label>
+        <input class="caca-in" id="ccPadrao" value="${c.padraoDescontos}" style="margin-bottom:4px;">
+        <p class="sub" style="margin-bottom:12px;">Padrão 5,4,3,2 = 5 descontos → frete grátis → 4 descontos → refri → 3 descontos → sobremesa → 2 descontos → pizza → recomeça.</p>
+
+        <button class="btn-salvar-prod" style="width:100%;padding:12px;" onclick="salvarCacaNiquel(this)">Salvar configurações</button>
+      </div>
+
+      <div style="margin-top:18px;">
+        <span class="caca-lb">Fila de prêmios (você está na posição ${cacaCache.posicao} de ${seq.length})</span>
+        <div style="font-size:1.15rem;line-height:1.9;margin-top:4px;">${seqHtml}</div>
+        <p class="sub">🏷️ desconto · 🛵 frete grátis · 🥤 refri · 🍰 sobremesa · 🍕 pizza. O destacado é o próximo a sair.</p>
+      </div>
+    </div>`;
+}
+async function alternarCaca(){
+  const btn = document.getElementById('btnToggleCaca');
+  if(btn) btn.disabled = true;
+  const d = await apiPost('cacaSalvarConfig', { campos:{ ativa: !cacaCache.config.ativa } }).catch(()=>({ok:false}));
+  if(!d.ok){ if(btn) btn.disabled=false; alert(d.erro||'Não foi possível atualizar agora.'); return; }
+  cacaCache = d; renderCacaNiquel();
+}
+async function salvarCacaNiquel(btn){
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const todos = document.getElementById('cdTodos').checked;
+  const marcados = [...document.querySelectorAll('.cd-dia:checked')].map(x=>x.value);
+  const campos = {
+    diasSemana: (todos || !marcados.length) ? 'todos' : marcados.join(','),
+    descontoPct: Number(document.getElementById('ccDesc').value)||20,
+    freteGratisMax: Number(document.getElementById('ccFrete').value)||0,
+    produtoRefriId: document.getElementById('ccRefri').value,
+    produtoSobremesaId: document.getElementById('ccSobremesa').value,
+    produtoPizzaId: document.getElementById('ccPizza').value,
+    tamanhoPizza: document.getElementById('ccTamPizza').value.trim()||'Grande',
+    tamanhoSobremesa: document.getElementById('ccTamSobremesa').value.trim()||'Grande',
+    padraoDescontos: document.getElementById('ccPadrao').value.trim()||'5,4,3,2'
+  };
+  const d = await apiPost('cacaSalvarConfig', { campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!d.ok){ alert(d.erro||'Não foi possível salvar agora.'); return; }
+  cacaCache = d; renderCacaNiquel();
 }
 
 /* ---------- início ---------- */
