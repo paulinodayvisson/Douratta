@@ -74,6 +74,24 @@ button{font-family:inherit;border:none;cursor:pointer;}
 .msg-inline{font-size:0.78rem;color:var(--vermelho);margin-top:8px;min-height:1em;}
 .btn-retry{display:block;margin:0 auto 6px;background:var(--dourado);color:var(--carvao);padding:11px 22px;border-radius:12px;font-weight:800;font-size:0.85rem;}
 .voltar{display:block;text-align:center;margin-top:6px;font-size:0.85rem;font-weight:700;color:var(--carvao-soft);text-decoration:underline;}
+
+/* ---- live da cozinha (discreta, não compete com o status do pedido) ---- */
+.live-card{padding:14px 14px 16px;}
+.live-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:2px;}
+.live-head h2{font-size:0.92rem;}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:var(--vermelho);color:#fff;font-size:0.68rem;font-weight:800;letter-spacing:.03em;padding:3px 9px 3px 7px;border-radius:99px;flex-shrink:0;}
+.live-badge .dot{width:6px;height:6px;border-radius:50%;background:#fff;animation:livePulso 1.4s ease-in-out infinite;}
+@keyframes livePulso{0%,100%{opacity:1;}50%{opacity:.35;}}
+.live-toggle{background:none;color:var(--carvao-soft);font-size:0.76rem;font-weight:700;display:flex;align-items:center;gap:3px;padding:4px 2px;opacity:.75;flex-shrink:0;}
+.live-toggle .material-symbols-outlined{font-size:18px;}
+.live-frame-wrap{margin-top:10px;border-radius:14px;overflow:hidden;aspect-ratio:16/9;background:#111;position:relative;}
+.live-frame-wrap iframe{width:100%;height:100%;display:block;border:0;}
+.live-off{margin-top:10px;text-align:center;padding:22px 10px;border-radius:14px;background:var(--avorio);}
+.live-off .ico{width:40px;height:40px;border-radius:50%;background:var(--avorio-dark);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:var(--dourado-dark);}
+.live-off p{font-size:0.82rem;opacity:.75;line-height:1.5;max-width:280px;margin:0 auto;}
+.live-off p b{opacity:1;color:var(--carvao);}
+.live-collapsed{margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:var(--avorio);font-size:0.8rem;font-weight:700;}
+.live-collapsed button{background:var(--dourado);color:var(--carvao);font-size:0.76rem;font-weight:800;padding:6px 12px;border-radius:99px;}
 </style>
 </head>
 <body>
@@ -271,6 +289,8 @@ function render_(p){
   $('conteudo').innerHTML = `
     <div class="card" id="cardStatus">${statusHtml_(p)}</div>
 
+    <div class="card live-card" id="cardLive"></div>
+
     <div class="card">
       <span class="status-tag">Pedido ${esc_(p.id)}</span>
       <h2><span class="material-symbols-outlined">person</span> ${esc_(p.nome||'Cliente')}</h2>
@@ -292,6 +312,7 @@ function render_(p){
     </div>
   `;
   window._payloadPixAtual = pix ? pix.payload : '';
+  atualizarLive_(p.live);
 }
 
 function copiarPix_(){
@@ -302,6 +323,56 @@ function copiarPix_(){
   } else {
     alert('Não foi possível copiar automaticamente. Copie o código exibido na tela.');
   }
+}
+
+/* ---------- live da cozinha (opcional — só aparece se o painel ligar) ---------- */
+const LS_LIVE_OCULTA_ = 'douratta_live_oculta';
+let liveEstadoRenderizado_ = null; // evita redesenhar à toa a cada poll
+function liveOculta_(){ try{ return localStorage.getItem(LS_LIVE_OCULTA_) === '1'; }catch(e){ return false; } }
+function liveDefinirOculta_(v){ try{ localStorage.setItem(LS_LIVE_OCULTA_, v?'1':'0'); }catch(e){} }
+
+function liveCardConteudo_(live, oculta){
+  const ativa = !!(live && live.ativa && live.videoId);
+  if(oculta){
+    return `<div class="live-collapsed">
+      <span>${ativa ? '🔴 Live da cozinha em andamento' : 'Live da cozinha'}</span>
+      <button onclick="alternarLiveOculta_()">Mostrar</button>
+    </div>`;
+  }
+  const cabecalho = `
+    <div class="live-head">
+      <h2><span class="material-symbols-outlined">local_pizza</span> Sua pizza, ao vivo${ativa ? '' : ''}</h2>
+      ${ativa ? '<span class="live-badge"><span class="dot"></span>AO VIVO</span>' : ''}
+    </div>`;
+  const corpo = ativa
+    ? `<div class="live-frame-wrap"><iframe src="https://www.youtube.com/embed/${live.videoId}?autoplay=0&rel=0" title="Live da cozinha Douratta" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>`
+    : `<div class="live-off">
+        <div class="ico"><span class="material-symbols-outlined">videocam_off</span></div>
+        <p><b>A cozinha está fora do ar por enquanto.</b><br>Sem transmissão agora — mas sua pizza está sendo preparada com o mesmo capricho de sempre. Assim que a live abrir, ela aparece aqui.</p>
+      </div>`;
+  const rodape = `<div style="text-align:right;margin-top:8px;">
+      <button class="live-toggle" onclick="alternarLiveOculta_()">
+        <span class="material-symbols-outlined">visibility_off</span> Ocultar
+      </button>
+    </div>`;
+  return cabecalho + corpo + rodape;
+}
+
+function atualizarLive_(live){
+  window._liveAtual = live || { ativa:false, videoId:'' };
+  const oculta = liveOculta_();
+  const chave = JSON.stringify(window._liveAtual) + '|' + (oculta?'1':'0');
+  if(chave === liveEstadoRenderizado_) return; // sem mudança: não redesenha (evita piscar/recarregar o iframe)
+  liveEstadoRenderizado_ = chave;
+  const el = $('cardLive');
+  if(el) el.innerHTML = liveCardConteudo_(window._liveAtual, oculta);
+}
+
+function alternarLiveOculta_(){
+  const novoEstado = !liveOculta_();
+  liveDefinirOculta_(novoEstado);
+  liveEstadoRenderizado_ = null; // força redesenho já que o usuário agiu
+  atualizarLive_(window._liveAtual);
 }
 
 /* ---------- "Já recebi meu pedido" (ação que já existe no Apps Script) ---------- */
@@ -342,7 +413,7 @@ async function buscar_(){
     const r = await consultarPedido_(pedidoId_);
     if(r.tipo === 'ok'){
       if(!renderizado_){ render_(r.dados); renderizado_ = true; }
-      else atualizarStatus_(r.dados);
+      else { atualizarStatus_(r.dados); atualizarLive_(r.dados.live); }
       if((r.dados.status||'novo') === 'entregue') pararPolling_();
       else if(!pollTimer_) agendarPolling_();
     } else if(!renderizado_){
