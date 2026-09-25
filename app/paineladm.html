@@ -235,6 +235,10 @@ table td.mono{font-family:var(--font-mono);}
       <span class="material-symbols-outlined">redeem</span>
       Giro Premiado
     </button>
+    <button class="tab-btn" data-tab="live" onclick="mudarAba('live')">
+      <span class="material-symbols-outlined">live_tv</span>
+      Live
+    </button>
     <button class="tab-btn" data-tab="custos" onclick="mudarAba('custos')">
       <span class="material-symbols-outlined">calculate</span>
       Custos
@@ -260,6 +264,7 @@ table td.mono{font-family:var(--font-mono);}
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
     <div class="tab-panel" id="tabCacaniquel"><div class="loading-note">Carregando…</div></div>
+    <div class="tab-panel" id="tabLive"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabCustos"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabFinanceiro"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabConfiguracoes"><div class="loading-note">Carregando configurações…</div></div>
@@ -519,6 +524,7 @@ function mudarAba(nome){
   if(nome==='checklist') renderChecklist();
   if(nome==='configuracoes') carregarConfiguracoes();
   if(nome==='cacaniquel') carregarCacaNiquel();
+  if(nome==='live') carregarLive();
   if(nome==='custos') carregarCustos();
   if(nome==='financeiro') carregarFinanceiro();
 }
@@ -956,6 +962,77 @@ async function salvarCacaNiquel(btn){
   if(restaurar) restaurar();
   if(!d.ok){ alert(d.erro||'Não foi possível salvar agora.'); return; }
   cacaCache = d; renderCacaNiquel();
+}
+
+
+/* ---------- ABA LIVE ---------- */
+let liveCache = null;
+function liveExtrairVideoId_(link){
+  const s = String(link||'').trim();
+  const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|live\/|embed\/))([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : '';
+}
+async function carregarLive(){
+  const el = document.getElementById('tabLive');
+  el.innerHTML = '<div class="loading-note">Carregando…</div>';
+  const d = await apiPost('liveObterConfig', {}).catch(()=>({ok:false}));
+  if(!d.ok){ el.innerHTML = `<div class="empty-note">${d.erro||'Não foi possível carregar agora. (Lembre de atualizar o Code.gs e gerar nova implantação.)'}</div>`; return; }
+  liveCache = d;
+  renderLive();
+}
+function renderLive(){
+  const el = document.getElementById('tabLive');
+  const c = liveCache.config;
+  const videoId = liveExtrairVideoId_(c.link);
+  const linkValido = !!videoId;
+  el.innerHTML = `
+    <div class="config-card">
+      <h3>Live da cozinha 🔴</h3>
+      <p class="sub">Quando ligada, o cliente vê a transmissão ao vivo do YouTube na tela de acompanhar pedido, junto com o status. Cole o link da live abaixo (precisa estar AO VIVO no YouTube pra aparecer pra ele).</p>
+
+      <div class="loja-toggle-row">
+        <span class="loja-toggle-label ${!c.ativa?'ativo':''}">Desligada</span>
+        <button class="loja-toggle ${c.ativa?'on':''}" id="btnToggleLive" onclick="alternarLive()" role="switch" aria-checked="${c.ativa}" ${linkValido?'':'disabled'}>
+          <span class="loja-toggle-knob"></span>
+        </button>
+        <span class="loja-toggle-label ${c.ativa?'ativo':''}">Ligada</span>
+      </div>
+      <p class="sub" style="margin-top:12px;text-align:center;">${
+        !linkValido ? '⚠️ Cole um link de live do YouTube válido abaixo antes de ligar.'
+        : (c.ativa ? '✅ Aparecendo agora na tela de acompanhar pedido dos clientes.' : 'Não aparece pros clientes.')
+      }</p>
+
+      <div style="margin-top:18px;">
+        <label class="caca-lb">Link da live no YouTube</label>
+        <input class="caca-in" id="lvLink" placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX" value="${(c.link||'').replace(/"/g,'&quot;')}">
+        <p class="sub" style="margin:-6px 0 12px;">Aceita link de "assistir" (watch?v=), youtu.be/ ou /live/. Cole o link de qualquer um desses formatos.</p>
+
+        <button class="btn-salvar-prod" style="width:100%;padding:12px;" onclick="salvarLive(this)">Salvar link</button>
+      </div>
+
+      ${videoId ? `
+      <div style="margin-top:18px;">
+        <span class="caca-lb">Pré-visualização</span>
+        <div style="margin-top:8px;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000;">
+          <iframe width="100%" height="100%" style="display:block;border:0;" src="https://www.youtube.com/embed/${videoId}" title="Pré-visualização da live" allow="accelerometer; encrypted-media; gyroscope" allowfullscreen></iframe>
+        </div>
+      </div>` : ''}
+    </div>`;
+}
+async function alternarLive(){
+  const btn = document.getElementById('btnToggleLive');
+  if(btn) btn.disabled = true;
+  const d = await apiPost('liveSalvarConfig', { campos:{ ativa: !liveCache.config.ativa } }).catch(()=>({ok:false}));
+  if(!d.ok){ if(btn) btn.disabled=false; alert(d.erro||'Não foi possível atualizar agora.'); return; }
+  liveCache = d; renderLive();
+}
+async function salvarLive(btn){
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const link = document.getElementById('lvLink').value.trim();
+  const d = await apiPost('liveSalvarConfig', { campos:{ link } }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!d.ok){ alert(d.erro||'Não foi possível salvar agora.'); return; }
+  liveCache = d; renderLive();
 }
 
 
