@@ -136,6 +136,23 @@ table td.mono{font-family:var(--font-mono);}
 .prod-edit-row .mini-field input{width:78px;padding:7px 8px;border:1.5px solid var(--linha);border-radius:8px;font-size:0.82rem;}
 .toggle-ativo{display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;}
 .btn-salvar-prod{background:var(--dourado);color:var(--carvao);padding:8px 14px;border-radius:9px;font-weight:700;font-size:0.75rem;}
+.prod-edit-row .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;}
+.prod-edit-row .pbody{display:none;width:100%;margin-top:12px;padding-top:12px;border-top:1px dashed var(--linha);}
+.prod-edit-row.open .pbody{display:block;}
+.inativo-tag{font-size:0.68rem;font-weight:700;color:var(--vermelho);margin-left:8px;}
+.pfield{margin-bottom:10px;}
+.pfield label{display:block;font-size:0.72rem;font-weight:700;opacity:.65;margin-bottom:4px;}
+.pfield input,.pfield select,.pfield textarea{width:100%;padding:9px 10px;border:1.5px solid var(--linha);border-radius:9px;font-size:0.85rem;background:var(--avorio);}
+.pfield textarea{min-height:56px;resize:vertical;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;}
+.prow-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.btn-excluir-prod{background:var(--vermelho);color:#fff;padding:8px 14px;border-radius:9px;font-weight:700;font-size:0.75rem;}
+.btn-novo-produto{background:var(--carvao);color:var(--avorio);padding:11px 18px;border-radius:11px;font-weight:700;font-size:0.82rem;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
+.novo-produto-card,.novo-bairro-card{background:var(--bianco);border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 4px 16px rgba(33,26,15,0.08);}
+.novo-produto-card h3,.novo-bairro-card h3{font-family:var(--font-display);font-size:1.05rem;margin-bottom:12px;}
+.bairro-row{background:var(--bianco);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px;}
+.bairro-row .nome{font-weight:700;font-size:0.88rem;flex:1;min-width:140px;}
+.btn-cancelar{flex:0 0 auto;width:44px;background:var(--vermelho);color:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;}
 
 .empty-note{text-align:center;padding:40px 10px;opacity:.5;font-size:0.88rem;}
 
@@ -230,6 +247,10 @@ table td.mono{font-family:var(--font-mono);}
       <span class="material-symbols-outlined">restaurant_menu</span>
       Cardápio
     </button>
+    <button class="tab-btn" data-tab="bairros" onclick="mudarAba('bairros')">
+      <span class="material-symbols-outlined">map</span>
+      Bairros
+    </button>
     <button class="tab-btn" data-tab="cacaniquel" onclick="mudarAba('cacaniquel')">
       <span class="material-symbols-outlined">redeem</span>
       Giro Premiado
@@ -262,6 +283,7 @@ table td.mono{font-family:var(--font-mono);}
     <div class="tab-panel" id="tabChecklist"><div class="loading-note">Carregando checklist…</div></div>
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
+    <div class="tab-panel" id="tabBairros"><div class="loading-note">Carregando bairros…</div></div>
     <div class="tab-panel" id="tabCacaniquel"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabLive"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabCustos"><div class="loading-note">Carregando…</div></div>
@@ -520,6 +542,7 @@ function mudarAba(nome){
   document.getElementById('tab'+nome.charAt(0).toUpperCase()+nome.slice(1)).classList.add('active');
   if(nome==='pontuacao') carregarPontuacao();
   if(nome==='cardapio') carregarCardapio();
+  if(nome==='bairros') carregarBairros();
   if(nome==='checklist') renderChecklist();
   if(nome==='configuracoes') carregarConfiguracoes();
   if(nome==='cacaniquel') carregarCacaNiquel();
@@ -610,10 +633,24 @@ function renderPedidos(){
         <button class="btn-imprimir" onclick="reimprimirPedido('${p.id}')" title="Imprimir pedido">
           <span class="material-symbols-outlined" style="font-size:19px;">print</span>
         </button>
+        <button class="btn-cancelar" onclick="cancelarPedido('${p.id}', this)" title="Cancelar pedido">
+          <span class="material-symbols-outlined" style="font-size:19px;">close</span>
+        </button>
       </div>
     </div>
   `;
   }).join('')}</div>`;
+}
+
+// Cancela um pedido (novo ou aceito). Não apaga a linha da planilha —
+// só muda o status pra "cancelado", mantendo o histórico/auditoria;
+// o pedido some sozinho das abas Pedidos e Checklist e do Financeiro.
+async function cancelarPedido(id, btn){
+  if(!confirm('Cancelar este pedido? Essa ação não pode ser desfeita.')) return;
+  const restaurar = setBtnLoading_(btn, '');
+  const data = await apiPost('cancelarPedido', { id }).catch(()=>({ok:false}));
+  if(!data.ok){ if(restaurar) restaurar(); alert(data.erro || 'Não foi possível cancelar agora.'); return; }
+  await atualizarTudo();
 }
 
 async function aceitarPedido(id, btn){
@@ -690,7 +727,7 @@ const STATUS_INFO_ = {
 };
 function renderChecklist(){
   const hojeStr = new Date().toDateString();
-  const doDia = pedidosCache.filter(p=>p.status!=='novo' && new Date(p.dataHora).toDateString()===hojeStr);
+  const doDia = pedidosCache.filter(p=>p.status!=='novo' && p.status!=='cancelado' && new Date(p.dataHora).toDateString()===hojeStr);
   const el = document.getElementById('tabChecklist');
   if(!doDia.length){ el.innerHTML = '<div class="empty-note">Nenhum pedido aceito hoje ainda.</div>'; return; }
   el.innerHTML = `<div class="grid">${doDia.map(p=>{
@@ -755,8 +792,10 @@ async function carregarPontuacao(){
   </tbody></table>`;
 }
 
-/* ---------- ABA CARDÁPIO ---------- */
-let cardapioCache = { MENU:{}, CATS:[] };
+/* ---------- ABA CARDÁPIO (criar, editar completo, excluir) ---------- */
+let cardapioCache = { MENU:{}, CATS:[], produtos:[] };
+let cardapioAbrirId = null; // id do produto cuja linha está expandida pra edição
+let cardapioNovoAberto = false;
 async function carregarCardapio(){
   const el = document.getElementById('tabCardapio');
   el.innerHTML = '<div class="loading-note">Carregando…</div>';
@@ -764,54 +803,251 @@ async function carregarCardapio(){
   if(!data.ok){ el.innerHTML = `<div class="empty-note">${data.erro||'Não foi possível carregar o cardápio agora.'}</div>`; return; }
   cardapioCache.MENU = data.MENU || {};
   cardapioCache.CATS = data.CATS || [];
+  cardapioCache.produtos = data.produtos || [];
   renderCardapioEdit();
+}
+function catOptionsHtml_(categoriaSelecionada){
+  return cardapioCache.CATS.map(c=>`<option value="${c.id}" ${c.id===categoriaSelecionada?'selected':''}>${c.label||c.id}</option>`).join('');
+}
+function tipoDaCategoria_(categoriaId){
+  const cat = cardapioCache.CATS.find(c=>c.id===categoriaId);
+  return cat ? cat.tipo : 'pizza';
+}
+function escapAttr_(s){ return String(s==null?'':s).replace(/"/g,'&quot;'); }
+function campoPrecoHtml_(tipo, prefixo, p){
+  p = p || {};
+  if(tipo === 'simples'){
+    return `<div class="pfield"><label>Preço</label><input type="number" step="0.5" id="${prefixo}-preco_unico" value="${p.precoUnico ?? ''}"></div>`;
+  }
+  if(tipo === 'bebida'){
+    return `<div class="pgrid">
+      <div class="pfield"><label>Preço</label><input type="number" step="0.5" id="${prefixo}-preco_unico" value="${p.precoUnico ?? ''}"></div>
+      <div class="pfield"><label>Volume (ex.: 350ml)</label><input id="${prefixo}-volume" value="${p.volume ?? ''}"></div>
+    </div>`;
+  }
+  return `<div class="pgrid">
+    <div class="pfield"><label>Broto</label><input type="number" step="0.5" id="${prefixo}-preco_broto" value="${p.precoBroto ?? ''}"></div>
+    <div class="pfield"><label>Média</label><input type="number" step="0.5" id="${prefixo}-preco_media" value="${p.precoMedia ?? ''}"></div>
+    <div class="pfield"><label>Grande</label><input type="number" step="0.5" id="${prefixo}-preco_grande" value="${p.precoGrande ?? ''}"></div>
+    <div class="pfield"><label>Família</label><input type="number" step="0.5" id="${prefixo}-preco_familia" value="${p.precoFamilia ?? ''}"></div>
+  </div>`;
 }
 function renderCardapioEdit(){
   const el = document.getElementById('tabCardapio');
-  el.innerHTML = `<p style="font-size:0.8rem;opacity:.65;margin-bottom:16px;">Ajuste rápido de preços e disponibilidade. Pra criar produto novo, trocar fotos ou ingredientes, edite direto na planilha.</p>` +
-    cardapioCache.CATS.map(cat=>{
-      const itens = cardapioCache.MENU[cat.id] || [];
-      if(!itens.length) return '';
-      const tipoPizza = cat.tipo === 'pizza';
-      return `<div class="cat-block"><h3>${cat.label||cat.id}</h3>
-        ${itens.map(p=>`
-          <div class="prod-edit-row" id="prow-${p.id}">
-            <div class="nome">${p.name}</div>
-            ${tipoPizza ? `
-              <div class="mini-field"><label>Broto</label><input type="number" step="0.5" id="pf-${p.id}-broto" value="${p.sizes?.broto ?? ''}"></div>
-              <div class="mini-field"><label>Média</label><input type="number" step="0.5" id="pf-${p.id}-media" value="${p.sizes?.media ?? ''}"></div>
-              <div class="mini-field"><label>Grande</label><input type="number" step="0.5" id="pf-${p.id}-grande" value="${p.sizes?.grande ?? ''}"></div>
-              <div class="mini-field"><label>Família</label><input type="number" step="0.5" id="pf-${p.id}-familia" value="${p.sizes?.familia ?? ''}"></div>
-            ` : `
-              <div class="mini-field"><label>Preço</label><input type="number" step="0.5" id="pf-${p.id}-unico" value="${p.price ?? ''}"></div>
-            `}
-            <label class="toggle-ativo"><input type="checkbox" id="pf-${p.id}-ativo" ${p.ativo===false?'':'checked'}> Ativo</label>
-            <button class="btn-salvar-prod" onclick="salvarProduto('${p.id}', ${tipoPizza}, this)">Salvar</button>
+  const porCategoria = {};
+  cardapioCache.produtos.forEach(p=>{ (porCategoria[p.categoriaId] = porCategoria[p.categoriaId] || []).push(p); });
+
+  const formNovo = cardapioNovoAberto ? `
+    <div class="novo-produto-card">
+      <h3>Novo produto</h3>
+      <div class="pgrid">
+        <div class="pfield" style="grid-column:1/-1;"><label>Nome</label><input id="np-nome" placeholder="Ex.: Quatro Queijos"></div>
+        <div class="pfield"><label>Categoria</label><select id="np-categoria_id" onchange="renderCardapioEdit()">${catOptionsHtml_(document.getElementById('np-categoria_id')?.value)}</select></div>
+        <div class="pfield"><label>Tempo de preparo</label><input id="np-tempo_preparo" placeholder="Ex.: 30–35 min"></div>
+      </div>
+      <div class="pfield"><label>Descrição</label><textarea id="np-descricao"></textarea></div>
+      <div class="pfield"><label>Ingredientes (separados por vírgula)</label><input id="np-ingredientes" placeholder="Molho de tomate, Muçarela, ..."></div>
+      <div class="pgrid">
+        <div class="pfield"><label>Imagem (URL)</label><input id="np-imagem_url"></div>
+        <div class="pfield"><label>Imagem 2 (opcional)</label><input id="np-imagem_url_2"></div>
+        <div class="pfield"><label>Imagem 3 (opcional)</label><input id="np-imagem_url_3"></div>
+      </div>
+      <div id="np-precos">${campoPrecoHtml_(tipoDaCategoria_(document.getElementById('np-categoria_id')?.value), 'np')}</div>
+      <div class="prow-actions">
+        <button class="btn-salvar-prod" onclick="criarProduto(this)">Criar produto</button>
+        <button class="btn-excluir-prod" style="background:var(--avorio-dark);color:var(--carvao);" onclick="cardapioNovoAberto=false;renderCardapioEdit();">Cancelar</button>
+      </div>
+    </div>` : `<button class="btn-novo-produto" onclick="cardapioNovoAberto=true;renderCardapioEdit();"><span class="material-symbols-outlined">add</span> Novo produto</button>`;
+
+  el.innerHTML = formNovo + cardapioCache.CATS.map(cat=>{
+    const itens = porCategoria[cat.id] || [];
+    if(!itens.length) return '';
+    return `<div class="cat-block"><h3>${cat.label||cat.id}</h3>
+      ${itens.map(p=>{
+        const aberto = cardapioAbrirId === p.id;
+        return `<div class="prod-edit-row ${aberto?'open':''}" id="prow-${p.id}">
+          <div class="ph" onclick="cardapioAbrirId = cardapioAbrirId==='${p.id}'?null:'${p.id}'; renderCardapioEdit();">
+            <div class="nome">${p.nome}${p.ativo===false?'<span class="inativo-tag">INATIVO</span>':''}</div>
+            <span class="material-symbols-outlined">${aberto?'expand_less':'expand_more'}</span>
           </div>
-        `).join('')}
+          ${aberto ? `<div class="pbody">
+            <div class="pfield"><label>Nome</label><input id="pf-${p.id}-nome" value="${escapAttr_(p.nome)}"></div>
+            <div class="pfield"><label>Categoria</label><select id="pf-${p.id}-categoria_id">${catOptionsHtml_(p.categoriaId)}</select></div>
+            <div class="pfield"><label>Descrição</label><textarea id="pf-${p.id}-descricao">${escapAttr_(p.descricao)}</textarea></div>
+            <div class="pfield"><label>Ingredientes (separados por vírgula)</label><input id="pf-${p.id}-ingredientes" value="${escapAttr_(p.ingredientesTexto)}"></div>
+            <div class="pgrid">
+              <div class="pfield"><label>Imagem (URL)</label><input id="pf-${p.id}-imagem_url" value="${escapAttr_(p.imagemUrl)}"></div>
+              <div class="pfield"><label>Imagem 2</label><input id="pf-${p.id}-imagem_url_2" value="${escapAttr_(p.imagemUrl2)}"></div>
+              <div class="pfield"><label>Imagem 3</label><input id="pf-${p.id}-imagem_url_3" value="${escapAttr_(p.imagemUrl3)}"></div>
+            </div>
+            <div class="pfield"><label>Tempo de preparo</label><input id="pf-${p.id}-tempo_preparo" value="${escapAttr_(p.tempoPreparo)}"></div>
+            ${campoPrecoHtml_(p.tipo, `pf-${p.id}`, p)}
+            <label class="toggle-ativo"><input type="checkbox" id="pf-${p.id}-ativo" ${p.ativo===false?'':'checked'}> Ativo (aparece no cardápio)</label>
+            <div class="prow-actions">
+              <button class="btn-salvar-prod" onclick="salvarProduto('${p.id}', '${p.tipo}', this)">Salvar alterações</button>
+              <button class="btn-excluir-prod" onclick="excluirProduto('${p.id}', this)">Excluir produto</button>
+            </div>
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+function lerCamposPreco_(tipo, prefixo){
+  const campos = {};
+  const v = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  if(tipo === 'simples'){
+    campos.preco_unico = v(`${prefixo}-preco_unico`);
+  } else if(tipo === 'bebida'){
+    campos.preco_unico = v(`${prefixo}-preco_unico`);
+    campos.volume = v(`${prefixo}-volume`);
+  } else {
+    campos.preco_broto = v(`${prefixo}-preco_broto`);
+    campos.preco_media = v(`${prefixo}-preco_media`);
+    campos.preco_grande = v(`${prefixo}-preco_grande`);
+    campos.preco_familia = v(`${prefixo}-preco_familia`);
+  }
+  return campos;
+}
+async function salvarProduto(id, tipo, btn){
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const campos = Object.assign({
+    nome: document.getElementById(`pf-${id}-nome`).value,
+    categoria_id: document.getElementById(`pf-${id}-categoria_id`).value,
+    descricao: document.getElementById(`pf-${id}-descricao`).value,
+    ingredientes: document.getElementById(`pf-${id}-ingredientes`).value,
+    imagem_url: document.getElementById(`pf-${id}-imagem_url`).value,
+    imagem_url_2: document.getElementById(`pf-${id}-imagem_url_2`).value,
+    imagem_url_3: document.getElementById(`pf-${id}-imagem_url_3`).value,
+    tempo_preparo: document.getElementById(`pf-${id}-tempo_preparo`).value,
+    ativo: document.getElementById(`pf-${id}-ativo`).checked
+  }, lerCamposPreco_(tipo, `pf-${id}`));
+  const data = await apiPost('atualizarProduto', { id, campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível salvar agora.'); return; }
+  await carregarCardapio();
+}
+async function excluirProduto(id, btn){
+  if(!confirm('Excluir este produto definitivamente? Essa ação não pode ser desfeita (diferente de desativar).')) return;
+  const restaurar = setBtnLoading_(btn, 'Excluindo...');
+  const data = await apiPost('excluirProduto', { id }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível excluir agora.'); return; }
+  cardapioAbrirId = null;
+  await carregarCardapio();
+}
+async function criarProduto(btn){
+  const categoriaId = document.getElementById('np-categoria_id').value;
+  const tipo = tipoDaCategoria_(categoriaId);
+  const campos = Object.assign({
+    nome: document.getElementById('np-nome').value,
+    categoria_id: categoriaId,
+    descricao: document.getElementById('np-descricao').value,
+    ingredientes: document.getElementById('np-ingredientes').value,
+    imagem_url: document.getElementById('np-imagem_url').value,
+    imagem_url_2: document.getElementById('np-imagem_url_2').value,
+    imagem_url_3: document.getElementById('np-imagem_url_3').value,
+    tempo_preparo: document.getElementById('np-tempo_preparo').value
+  }, lerCamposPreco_(tipo, 'np'));
+  if(!campos.nome.trim()){ alert('Dê um nome ao produto.'); return; }
+  const restaurar = setBtnLoading_(btn, 'Criando...');
+  const data = await apiPost('criarProduto', { campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível criar agora.'); return; }
+  cardapioNovoAberto = false;
+  await carregarCardapio();
+}
+
+/* ---------- ABA BAIRROS (taxa de entrega) ---------- */
+let bairrosCache = [];
+let bairroNovoAberto = false;
+let bairroEditandoNome = null;
+async function carregarBairros(){
+  const el = document.getElementById('tabBairros');
+  el.innerHTML = '<div class="loading-note">Carregando…</div>';
+  const data = await apiPost('listarBairrosAdmin', {}).catch(()=>({ok:false}));
+  if(!data.ok){ el.innerHTML = `<div class="empty-note">${data.erro||'Não foi possível carregar os bairros agora.'}</div>`; return; }
+  bairrosCache = data.bairros || [];
+  renderBairros();
+}
+function renderBairros(){
+  const el = document.getElementById('tabBairros');
+  const formNovo = bairroNovoAberto ? `
+    <div class="novo-bairro-card">
+      <h3>Novo bairro</h3>
+      <div class="pgrid">
+        <div class="pfield" style="grid-column:1/-1;"><label>Nome do bairro</label><input id="nb-nome" placeholder="Ex.: Santa Luzia"></div>
+        <div class="pfield"><label>Distância (km, só informativo)</label><input type="number" step="0.5" id="nb-distanciaKm"></div>
+        <div class="pfield"><label>Taxa de entrega (R$)</label><input type="number" step="0.5" id="nb-taxa"></div>
+      </div>
+      <div class="prow-actions">
+        <button class="btn-salvar-prod" onclick="criarBairro(this)">Criar bairro</button>
+        <button class="btn-excluir-prod" style="background:var(--avorio-dark);color:var(--carvao);" onclick="bairroNovoAberto=false;renderBairros();">Cancelar</button>
+      </div>
+    </div>` : `<button class="btn-novo-produto" onclick="bairroNovoAberto=true;renderBairros();"><span class="material-symbols-outlined">add</span> Novo bairro</button>`;
+
+  el.innerHTML = `<p style="font-size:0.8rem;opacity:.65;margin-bottom:16px;">Taxa de entrega fixa por bairro — é o valor cobrado quando o cliente escolhe esse bairro no cardápio.</p>${formNovo}` +
+    bairrosCache.map(b=>{
+      const editando = bairroEditandoNome === b.nome;
+      if(!editando){
+        return `<div class="bairro-row">
+          <div class="nome">${b.nome}${b.ativo===false?'<span class="inativo-tag">INATIVO</span>':''}</div>
+          <div class="mini-field"><label>Taxa</label><div>${formatBRL(b.taxa)}</div></div>
+          <button class="btn-salvar-prod" onclick="bairroEditandoNome='${escapAttr_(b.nome)}';renderBairros();">Editar</button>
+        </div>`;
+      }
+      return `<div class="bairro-row" style="flex-direction:column;align-items:stretch;">
+        <div class="pgrid">
+          <div class="pfield"><label>Nome</label><input id="bf-nome" value="${escapAttr_(b.nome)}"></div>
+          <div class="pfield"><label>Distância (km)</label><input type="number" step="0.5" id="bf-distanciaKm" value="${b.distanciaKm ?? ''}"></div>
+          <div class="pfield"><label>Taxa (R$)</label><input type="number" step="0.5" id="bf-taxa" value="${b.taxa ?? ''}"></div>
+        </div>
+        <label class="toggle-ativo"><input type="checkbox" id="bf-ativo" ${b.ativo===false?'':'checked'}> Ativo (aparece no cardápio)</label>
+        <div class="prow-actions">
+          <button class="btn-salvar-prod" onclick="salvarBairro('${escapAttr_(b.nome)}', this)">Salvar</button>
+          <button class="btn-excluir-prod" onclick="excluirBairro('${escapAttr_(b.nome)}', this)">Excluir bairro</button>
+          <button class="btn-excluir-prod" style="background:var(--avorio-dark);color:var(--carvao);" onclick="bairroEditandoNome=null;renderBairros();">Cancelar</button>
+        </div>
       </div>`;
     }).join('');
 }
-async function salvarProduto(id, tipoPizza, btn){
-  const restaurar = setBtnLoading_(btn, 'Salvando...');
-  const campos = { ativo: document.getElementById(`pf-${id}-ativo`).checked };
-  if(tipoPizza){
-    campos.preco_broto = document.getElementById(`pf-${id}-broto`).value;
-    campos.preco_media = document.getElementById(`pf-${id}-media`).value;
-    campos.preco_grande = document.getElementById(`pf-${id}-grande`).value;
-    campos.preco_familia = document.getElementById(`pf-${id}-familia`).value;
-  } else {
-    campos.preco_unico = document.getElementById(`pf-${id}-unico`).value;
-  }
-  const data = await apiPost('atualizarProduto', { id, campos }).catch(()=>({ok:false}));
+async function criarBairro(btn){
+  const nome = document.getElementById('nb-nome').value.trim();
+  if(!nome){ alert('Dê um nome ao bairro.'); return; }
+  const restaurar = setBtnLoading_(btn, 'Criando...');
+  const data = await apiPost('criarBairro', {
+    nome,
+    distanciaKm: document.getElementById('nb-distanciaKm').value,
+    taxa: document.getElementById('nb-taxa').value
+  }).catch(()=>({ok:false}));
   if(restaurar) restaurar();
-  const row = document.getElementById(`prow-${id}`);
-  if(data.ok){
-    row.style.background = 'var(--verde-pale)';
-    setTimeout(()=>{ row.style.background=''; }, 900);
-  } else {
-    alert(data.erro || 'Não foi possível salvar agora.');
-  }
+  if(!data.ok){ alert(data.erro || 'Não foi possível criar agora.'); return; }
+  bairroNovoAberto = false;
+  await carregarBairros();
+}
+async function salvarBairro(nomeOriginal, btn){
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const data = await apiPost('atualizarBairro', {
+    nomeOriginal,
+    campos: {
+      nome: document.getElementById('bf-nome').value,
+      distanciaKm: document.getElementById('bf-distanciaKm').value,
+      taxa: document.getElementById('bf-taxa').value,
+      ativo: document.getElementById('bf-ativo').checked
+    }
+  }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível salvar agora.'); return; }
+  bairroEditandoNome = null;
+  await carregarBairros();
+}
+async function excluirBairro(nome, btn){
+  if(!confirm(`Excluir o bairro "${nome}"? Essa ação não pode ser desfeita.`)) return;
+  const restaurar = setBtnLoading_(btn, 'Excluindo...');
+  const data = await apiPost('excluirBairro', { nome }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível excluir agora.'); return; }
+  await carregarBairros();
 }
 
 /* ---------- ABA CONFIGURAÇÕES ---------- */
