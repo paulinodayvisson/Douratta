@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -37,8 +36,8 @@ input,select,textarea{font-family:inherit;}
 .login-card p{font-size:0.82rem;opacity:.65;margin-bottom:18px;}
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:0.78rem;font-weight:600;margin-bottom:5px;}
-.field input{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:12px;font-size:0.95rem;background:var(--avorio);}
-.field input:focus{outline:none;border-color:var(--dourado);}
+.field input,.field select{width:100%;padding:12px 14px;border:1.5px solid var(--linha);border-radius:12px;font-size:0.95rem;background:var(--avorio);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--dourado);}
 .btn-primary{width:100%;background:var(--vermelho);color:#fff;padding:13px;border-radius:12px;font-weight:700;font-size:0.92rem;}
 .err-msg{color:var(--vermelho);font-size:0.8rem;margin-top:8px;min-height:1em;}
 
@@ -52,7 +51,6 @@ input,select,textarea{font-family:inherit;}
 .tab-btn{flex:1;min-width:110px;padding:13px 10px;font-weight:700;font-size:0.8rem;color:var(--carvao-soft);opacity:.55;border-bottom:3px solid transparent;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:6px;}
 .tab-btn.active{opacity:1;color:var(--vermelho);border-bottom-color:var(--vermelho);}
 .tab-btn .count{background:var(--vermelho);color:#fff;border-radius:99px;font-size:0.68rem;padding:1px 6px;min-width:16px;}
-.tab-btn svg{width:15px;height:15px;flex-shrink:0;}
 .content{max-width:1100px;margin:0 auto;padding:18px;}
 .tab-panel{display:none;}
 .tab-panel.active{display:block;}
@@ -71,7 +69,6 @@ input,select,textarea{font-family:inherit;}
 .oc-tag.aceito{background:var(--verde-pale);color:var(--verde);}
 .oc-line{font-size:0.82rem;margin-bottom:3px;display:flex;gap:6px;}
 .oc-line b{font-weight:700;}
-.oc-line svg{width:13px;height:13px;flex-shrink:0;margin-top:2px;opacity:.6;}
 .oc-itens{margin:10px 0;padding:10px 12px;background:var(--avorio);border-radius:12px;font-size:0.8rem;max-height:170px;overflow-y:auto;}
 .oc-item-row{margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed var(--linha);}
 .oc-item-row:last-child{margin-bottom:0;border-bottom:none;padding-bottom:0;}
@@ -79,10 +76,12 @@ input,select,textarea{font-family:inherit;}
 .oc-item-detail{opacity:.75;font-size:0.75rem;}
 .oc-total{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:10px;border-top:1px solid var(--linha);}
 .oc-total .valor{font-family:var(--font-display);font-weight:700;font-size:1.2rem;color:var(--vermelho);}
-.oc-actions{display:flex;gap:8px;margin-top:12px;}
-.btn-aceitar{flex:1;background:var(--verde);color:#fff;padding:11px;border-radius:11px;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:6px;}
-.btn-wpp{flex:1;background:var(--dourado);color:var(--carvao);padding:11px;border-radius:11px;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:6px;}
+.oc-actions{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.btn-aceitar{flex:1;min-width:120px;background:var(--verde);color:#fff;padding:11px;border-radius:11px;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-wpp{flex:1;min-width:100px;background:var(--dourado);color:var(--carvao);padding:11px;border-radius:11px;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:6px;}
 .btn-wpp svg,.btn-aceitar svg{width:16px;height:16px;}
+.btn-cancelar{flex:0 0 auto;width:44px;background:var(--vermelho);color:#fff;border-radius:11px;display:flex;align-items:center;justify-content:center;}
+.btn-imprimir{flex:0 0 auto;width:44px;background:var(--carvao);color:var(--avorio);border-radius:11px;display:flex;align-items:center;justify-content:center;}
 
 /* ---------- checklist ---------- */
 .check-card{background:var(--bianco);border-radius:18px;padding:16px;box-shadow:0 4px 16px rgba(33,26,15,0.07);}
@@ -94,7 +93,6 @@ input,select,textarea{font-family:inherit;}
 .check-item input[type=checkbox]{width:19px;height:19px;margin-top:2px;accent-color:var(--verde);flex-shrink:0;}
 .check-item.done label{text-decoration:line-through;opacity:.45;}
 .check-item label{font-size:0.85rem;line-height:1.4;}
-.check-item .detail{display:block;font-size:0.76rem;opacity:.7;margin-top:1px;}
 .check-title{font-weight:800;font-size:0.9rem;margin-top:12px;padding-bottom:4px;border-bottom:2px solid var(--carvao);}
 .check-title:first-of-type{margin-top:2px;}
 .tag-sem,.tag-com{display:inline-block;font-size:0.65rem;font-weight:800;border-radius:5px;padding:1px 6px;margin-right:6px;vertical-align:1px;}
@@ -102,12 +100,10 @@ input,select,textarea{font-family:inherit;}
 .tag-com{background:var(--verde-pale);color:var(--verde);}
 .btn-concluir{width:100%;margin-top:12px;background:var(--carvao);color:var(--avorio);padding:11px;border-radius:11px;font-weight:700;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:7px;}
 .btn-concluir[disabled]{background:var(--avorio-dark);color:var(--carvao-soft);opacity:.6;cursor:not-allowed;}
-.btn-concluir .material-symbols-outlined{font-size:18px;}
 .check-waiting{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:24px 10px;opacity:.6;font-size:0.82rem;}
-.check-waiting .material-symbols-outlined{font-size:32px;}
 .check-progress{text-align:right;font-size:0.72rem;font-weight:700;opacity:.55;margin-top:6px;}
 
-/* ---------- pontuação ---------- */
+/* ---------- pontuação / tabelas ---------- */
 table{width:100%;border-collapse:collapse;background:var(--bianco);border-radius:14px;overflow:hidden;}
 table th,table td{padding:11px 14px;text-align:left;font-size:0.85rem;border-bottom:1px solid var(--linha);}
 table th{background:var(--carvao);color:var(--avorio);font-size:0.72rem;text-transform:uppercase;letter-spacing:0.03em;}
@@ -127,16 +123,35 @@ table td.mono{font-family:var(--font-mono);}
 .loja-toggle.on .loja-toggle-knob{left:27px;}
 .loja-toggle[disabled]{opacity:.6;cursor:not-allowed;}
 
-/* ---------- cardápio ---------- */
+/* ---------- cardápio (gestão completa) ---------- */
 .cat-block{margin-bottom:22px;}
 .cat-block h3{font-family:var(--font-display);font-size:1.05rem;margin-bottom:10px;}
-.prod-edit-row{background:var(--bianco);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px;}
-.prod-edit-row .nome{font-weight:700;font-size:0.88rem;flex:1;min-width:140px;}
-.prod-edit-row .mini-field{display:flex;flex-direction:column;gap:3px;}
-.prod-edit-row .mini-field label{font-size:0.65rem;opacity:.6;font-weight:700;}
-.prod-edit-row .mini-field input{width:78px;padding:7px 8px;border:1.5px solid var(--linha);border-radius:8px;font-size:0.82rem;}
-.toggle-ativo{display:flex;align-items:center;gap:6px;font-size:0.72rem;font-weight:700;}
-.btn-salvar-prod{background:var(--dourado);color:var(--carvao);padding:8px 14px;border-radius:9px;font-weight:700;font-size:0.75rem;}
+.prod-edit-row{background:var(--bianco);border-radius:14px;padding:14px;margin-bottom:10px;}
+.prod-edit-row .ph{display:flex;justify-content:space-between;align-items:center;gap:10px;cursor:pointer;}
+.prod-edit-row .nome{font-weight:700;font-size:0.92rem;}
+.prod-edit-row .nome .inativo-tag{font-size:0.68rem;font-weight:700;color:var(--vermelho);margin-left:8px;}
+.prod-edit-row .pbody{display:none;margin-top:12px;padding-top:12px;border-top:1px dashed var(--linha);}
+.prod-edit-row.open .pbody{display:block;}
+.pfield{margin-bottom:10px;}
+.pfield label{display:block;font-size:0.72rem;font-weight:700;opacity:.65;margin-bottom:4px;}
+.pfield input,.pfield select,.pfield textarea{width:100%;padding:9px 10px;border:1.5px solid var(--linha);border-radius:9px;font-size:0.85rem;background:var(--avorio);}
+.pfield textarea{min-height:56px;resize:vertical;}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px;}
+.toggle-ativo{display:flex;align-items:center;gap:6px;font-size:0.78rem;font-weight:700;margin:10px 0;}
+.prow-actions{display:flex;gap:8px;margin-top:12px;}
+.btn-salvar-prod{background:var(--dourado);color:var(--carvao);padding:9px 16px;border-radius:9px;font-weight:700;font-size:0.78rem;}
+.btn-excluir-prod{background:var(--vermelho);color:#fff;padding:9px 16px;border-radius:9px;font-weight:700;font-size:0.78rem;}
+.btn-novo-produto{background:var(--carvao);color:var(--avorio);padding:11px 18px;border-radius:11px;font-weight:700;font-size:0.82rem;margin-bottom:18px;display:inline-flex;align-items:center;gap:6px;}
+.novo-produto-card{background:var(--bianco);border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 4px 16px rgba(33,26,15,0.08);}
+.novo-produto-card h3{font-family:var(--font-display);font-size:1.05rem;margin-bottom:12px;}
+
+/* ---------- bairros ---------- */
+.bairro-row{background:var(--bianco);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px;}
+.bairro-row .nome{font-weight:700;font-size:0.88rem;flex:1;min-width:140px;}
+.bairro-row .mini-field{display:flex;flex-direction:column;gap:3px;}
+.bairro-row .mini-field label{font-size:0.65rem;opacity:.6;font-weight:700;}
+.bairro-row .mini-field input{width:90px;padding:7px 8px;border:1.5px solid var(--linha);border-radius:8px;font-size:0.82rem;}
+.novo-bairro-card{background:var(--bianco);border-radius:16px;padding:16px;margin-bottom:20px;box-shadow:0 4px 16px rgba(33,26,15,0.08);max-width:560px;}
 
 .empty-note{text-align:center;padding:40px 10px;opacity:.5;font-size:0.88rem;}
 
@@ -144,31 +159,17 @@ table td.mono{font-family:var(--font-mono);}
 .acoes-topo{display:flex;justify-content:flex-end;margin-bottom:16px;}
 .btn-outra-pessoa{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--dourado);color:var(--carvao);padding:12px 18px;border-radius:12px;font-weight:800;font-size:0.82rem;letter-spacing:.02em;text-decoration:none;box-shadow:0 3px 10px rgba(198,135,10,0.25);}
 .btn-outra-pessoa:hover{background:#fbbf3c;}
-.btn-outra-pessoa:focus-visible{outline:3px solid var(--carvao);outline-offset:2px;}
 @media(max-width:600px){.acoes-topo{justify-content:stretch;}.btn-outra-pessoa{width:100%;}}
 .loading-note{text-align:center;padding:30px;opacity:.5;font-size:0.88rem;}
 
-/* ---------- impressão térmica automática do pedido ---------- */
-.btn-imprimir{flex:0 0 auto;width:44px;background:var(--carvao);color:var(--avorio);border-radius:11px;display:flex;align-items:center;justify-content:center;}
+/* ---------- impressão térmica ---------- */
 #areaImpressaoPedido{display:none;}
 @media print{
   body *{visibility:hidden;}
   #areaImpressaoPedido, #areaImpressaoPedido *{visibility:visible;}
   #areaImpressaoPedido{display:block;position:absolute;top:0;left:0;width:100%;}
-  /* 58mm de largura de bobina. Se a sua impressora for de 80mm, troque
-     "58mm" por "80mm" aqui e também no .recibo abaixo (width). */
   @page{margin:0;size:58mm auto;}
 }
-/* Recibo em HTML/CSS de verdade (negrito, seções, linhas tracejadas),
-   no mesmo estilo do PDF-modelo: título grande, seções em caixa alta,
-   valores alinhados à direita e um checklist de produção no fim.
-   Isso só funciona se a impressora imprimir a página como imagem/gráfico
-   (é o que praticamente toda impressora térmica de 58mm faz quando
-   instalada como impressora normal do Windows/Android e usada via
-   "Imprimir" do navegador). Se a sua estiver configurada num modo
-   "Generic / Text Only" que só cospe caracteres crus, ela vai ignorar
-   negrito/alinhamento — nesse caso me avise que eu volto pra versão em
-   texto puro monoespaçado. */
 .recibo{width:50mm;margin:0 auto;padding:2mm 3mm 4mm;font-family:Arial,Helvetica,sans-serif;color:#000;font-size:12.5px;line-height:1.4;}
 .recibo .r-center{text-align:center;}
 .recibo .r-logo{font-size:18px;font-weight:800;letter-spacing:.3px;}
@@ -185,7 +186,6 @@ table td.mono{font-family:var(--font-mono);}
 .recibo .r-item-nome{display:flex;justify-content:space-between;gap:2mm;font-weight:800;font-size:12.5px;}
 .recibo .r-item-det{font-size:10.5px;padding-left:2.4mm;opacity:.85;word-wrap:break-word;}
 .recibo .r-total{display:flex;justify-content:space-between;font-size:15px;font-weight:800;margin:.8mm 0;}
-.recibo .r-check{font-size:11.5px;margin:1.2mm 0;}
 .recibo .r-qr{text-align:center;margin:1.5mm 0 .5mm;}
 .recibo .r-qr img{width:34mm;height:34mm;display:block;margin:0 auto;padding:1.5mm;background:#fff;image-rendering:pixelated;}
 .recibo .r-qr-txt{font-size:10.5px;font-weight:700;margin-top:1mm;line-height:1.25;}
@@ -231,21 +231,9 @@ table td.mono{font-family:var(--font-mono);}
       <span class="material-symbols-outlined">restaurant_menu</span>
       Cardápio
     </button>
-    <button class="tab-btn" data-tab="cacaniquel" onclick="mudarAba('cacaniquel')">
-      <span class="material-symbols-outlined">redeem</span>
-      Giro Premiado
-    </button>
-    <button class="tab-btn" data-tab="live" onclick="mudarAba('live')">
-      <span class="material-symbols-outlined">live_tv</span>
-      Live
-    </button>
-    <button class="tab-btn" data-tab="custos" onclick="mudarAba('custos')">
-      <span class="material-symbols-outlined">calculate</span>
-      Custos
-    </button>
-    <button class="tab-btn" data-tab="financeiro" onclick="mudarAba('financeiro')">
-      <span class="material-symbols-outlined">monitoring</span>
-      Financeiro
+    <button class="tab-btn" data-tab="bairros" onclick="mudarAba('bairros')">
+      <span class="material-symbols-outlined">map</span>
+      Bairros
     </button>
     <button class="tab-btn" data-tab="configuracoes" onclick="mudarAba('configuracoes')">
       <span class="material-symbols-outlined">settings</span>
@@ -263,10 +251,7 @@ table td.mono{font-family:var(--font-mono);}
     <div class="tab-panel" id="tabChecklist"><div class="loading-note">Carregando checklist…</div></div>
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
-    <div class="tab-panel" id="tabCacaniquel"><div class="loading-note">Carregando…</div></div>
-    <div class="tab-panel" id="tabLive"><div class="loading-note">Carregando…</div></div>
-    <div class="tab-panel" id="tabCustos"><div class="loading-note">Carregando…</div></div>
-    <div class="tab-panel" id="tabFinanceiro"><div class="loading-note">Carregando…</div></div>
+    <div class="tab-panel" id="tabBairros"><div class="loading-note">Carregando bairros…</div></div>
     <div class="tab-panel" id="tabConfiguracoes"><div class="loading-note">Carregando configurações…</div></div>
   </div>
 </div>
@@ -277,13 +262,8 @@ table td.mono{font-family:var(--font-mono);}
    ========================================================= */
 const API_URL = 'https://script.google.com/macros/s/AKfycbz8qL33hAbb17yvAN8OvbSYN4xaH6NVdtLwZ65g_0IWz3pMyGI6p2wyRNDnb-cWVZec/exec';
 const LS_KEY = 'douratta_painel_senha_v1';
-const POLL_MS = 15000; // intervalo de checagem de novos pedidos
-// Endereço do cardápio da Douratta que o botão "FAZER PEDIDO PARA OUTRA
-// PESSOA" abre (em outra aba, pra o painel continuar recebendo pedidos).
-// CONFIRA/TROQUE aqui se o cardápio ficar em outro endereço.
+const POLL_MS = 15000;
 const CARDAPIO_URL = 'https://douratta.com.br/';
-// Página que o entregador abre ao escanear o QR Code impresso no papel.
-// O ID real do pedido entra em ?pedido=. NÃO altere a base.
 const INFOPEDIDO_URL_BASE = 'https://douratta.com.br/app/infopedido';
 
 let senhaPainel = '';
@@ -291,9 +271,9 @@ let abaAtual = 'pedidos';
 let pedidosCache = [];
 let idsConhecidos = new Set();
 let audioCtx = null;
-let checklistState = {}; // { [pedidoId]: { [indice]: true } } — persistido no localStorage
+let checklistState = {};
 
-/* ---------- som de notificação (Web Audio, sem arquivo externo) ---------- */
+/* ---------- som de notificação ---------- */
 function habilitarAudio(){
   try{
     audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
@@ -321,31 +301,16 @@ function tocarSom(){
 /* ---------- helpers ---------- */
 function formatBRL(v){ return (Number(v)||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
 function formatHora(d){ const dt = new Date(d); return dt.toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}); }
-
-/* =========================================================
-   IMPRESSÃO TÉRMICA — RECIBO EM HTML, no padrão do PDF-modelo
-   (Douratta / 58mm): título grande, seções em caixa alta, valores
-   alinhados à direita com flexbox e checklist de produção no fim.
-   Acentos são mantidos normalmente — isso só funciona se a impressora
-   imprimir a página como imagem (é o normal pra impressora térmica
-   instalada como impressora do sistema e usada via "Imprimir" do
-   navegador). Se a sua estiver em modo "Generic / Text Only" (só
-   texto cru, sem negrito/alinhamento), me avise que eu volto pra
-   versão em texto puro.
-   ========================================================= */
 function escaparHtml_(txt){
-  return String(txt==null?'':txt)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  return String(txt==null?'':txt).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
-// Uma linha de item do pedido: nome/qtd em negrito (+ preço, se o
-// pedido trouxer isso no item — campo "preco" ou "precoUnit"), e os
-// detalhes (sabor, borda, sem/com ingrediente, observação) embaixo,
-// em fonte menor, igual ao PDF-modelo.
+
+/* ---------- impressão térmica ---------- */
 function itemImpressaoHtml_(it){
   let titulo = '';
   const dets = [];
   const precoItem = (it.preco!=null && it.preco!=='') ? Number(it.preco)
-                   : (it.precoUnit!=null && it.precoUnit!=='') ? Number(it.precoUnit) : null;
+                    : (it.precoUnit!=null && it.precoUnit!=='') ? Number(it.precoUnit) : null;
   if(it.tipo==='pizza'){
     titulo = `${it.qty}x Pizza ${it.tamanho||''}`.trim();
     (it.sabores||[]).forEach(s=>{
@@ -380,8 +345,6 @@ function reciboHtmlPedido_(p){
   const trocoParaNum = Number(p.trocoPara)||0;
   const ehDinheiro = /dinheiro/i.test(p.formaPagamento||'');
   const troco = (ehDinheiro && trocoParaNum>0) ? Math.max(0, trocoParaNum-totalNum) : null;
-  // enderecoTexto é o endereço legível (novo campo); em pedidos bem
-  // antigos, sem esse campo, cai pro que tiver em "endereco".
   const endereco = p.enderecoTexto || p.endereco || '';
 
   let h = '';
@@ -414,17 +377,11 @@ function reciboHtmlPedido_(p){
   if(troco!=null) h += `<div class="r-row"><b>TROCO</b><b>${formatBRL(troco)}</b></div>`;
   if(p.codigoIndicacao) h += `<div class="r-row"><span>Indicação</span><span>${escaparHtml_(p.codigoIndicacao)}</span></div>`;
   h += `<hr class="r-solid">`;
-  // QR Code do pedido: o entregador escaneia direto no papel e abre
-  // https://douratta.com.br/app/infopedido?pedido=ID_DO_PEDIDO
   const qrSrc = qrImagemSrc_(linkInfoPedido_(p.id));
   h += `<div class="r-qr"><img src="${escaparHtml_(qrSrc)}" alt="QR Code do pedido"><div class="r-qr-txt">ENTREGADOR: escaneie para ver rota, contato e Pix</div></div>`;
   h += `<div class="r-foot">Obrigado pela preferência!<br>douratta.com.br</div>`;
   return h;
 }
-// Gera o QR Code no próprio navegador (biblioteca qrcodejs, já carregada
-// no <head>) e devolve como data URI — assim funciona na hora, sem
-// depender de internet na hora de imprimir. Se a biblioteca não tiver
-// carregado, cai pra um serviço externo de QR como plano B.
 function qrImagemSrc_(texto){
   try{
     if(typeof QRCode !== 'undefined'){
@@ -440,8 +397,6 @@ function imprimirPedido(p){
   if(!p){ alert('Não encontrei os dados desse pedido pra imprimir.'); return; }
   const area = document.getElementById('areaImpressaoPedido');
   area.innerHTML = `<div class="recibo">${reciboHtmlPedido_(p)}</div>`;
-  // espera as imagens do recibo (QR Code) terminarem de carregar antes de
-  // abrir a impressão — no máximo 2s, pra nunca travar a impressão.
   const imgs = Array.from(area.querySelectorAll('img'));
   const prontas = Promise.all(imgs.map(im=> im.complete ? Promise.resolve() : new Promise(res=>{ im.onload = im.onerror = res; })));
   Promise.race([prontas, new Promise(res=>setTimeout(res, 2000))]).then(()=>{
@@ -451,11 +406,6 @@ function imprimirPedido(p){
 function reimprimirPedido(id){
   imprimirPedido(pedidosCache.find(pd=>pd.id===id));
 }
-// Mostra um loader dentro do próprio botão clicado (spinner + texto),
-// e desabilita ele, pra pessoa nunca achar que o clique não funcionou
-// enquanto espera a resposta do servidor. Se a ação der certo, o card
-// costuma ser re-renderizado (o botão nem existe mais); se der erro,
-// chama a função devolvida pra restaurar o botão do jeito que estava.
 function setBtnLoading_(btn, textoCarregando){
   if(!btn) return null;
   const originalHtml = btn.innerHTML;
@@ -474,13 +424,6 @@ async function apiPost(acao, dados){
   return resp.json();
 }
 
-/* ---------- fazer pedido para outra pessoa (painel → cardápio) ---------- */
-// O botão "FAZER PEDIDO PARA OUTRA PESSOA" é um link (<a target="_blank">)
-// que abre o cardápio da Douratta em OUTRA aba, pra o painel continuar
-// recebendo pedidos. O atendente monta o pedido da pessoa que ligou/está
-// no balcão pelo fluxo normal do cardápio (mesmo Apps Script/planilha);
-// ele aparece aqui no painel como qualquer outro pedido novo. O endereço
-// do link vem da constante CARDAPIO_URL (definida no topo do <script>).
 function configurarBotaoOutraPessoa_(){
   const btn = document.getElementById('btnOutraPessoa');
   if(btn) btn.href = CARDAPIO_URL;
@@ -523,10 +466,7 @@ function mudarAba(nome){
   if(nome==='cardapio') carregarCardapio();
   if(nome==='checklist') renderChecklist();
   if(nome==='configuracoes') carregarConfiguracoes();
-  if(nome==='cacaniquel') carregarCacaNiquel();
-  if(nome==='live') carregarLive();
-  if(nome==='custos') carregarCustos();
-  if(nome==='financeiro') carregarFinanceiro();
+  if(nome==='bairros') carregarBairros();
 }
 
 /* ---------- ciclo de atualização (pedidos) ---------- */
@@ -611,6 +551,9 @@ function renderPedidos(){
         <button class="btn-imprimir" onclick="reimprimirPedido('${p.id}')" title="Imprimir pedido">
           <span class="material-symbols-outlined" style="font-size:19px;">print</span>
         </button>
+        <button class="btn-cancelar" onclick="cancelarPedido('${p.id}', this)" title="Cancelar pedido">
+          <span class="material-symbols-outlined" style="font-size:19px;">close</span>
+        </button>
       </div>
     </div>
   `;
@@ -619,8 +562,6 @@ function renderPedidos(){
 
 async function aceitarPedido(id, btn){
   const restaurar = setBtnLoading_(btn, 'Aceitando...');
-  // guarda os dados completos do pedido ANTES de atualizar a lista,
-  // pra ter o que imprimir mesmo que a atualização demore/falhe
   const pedidoOriginal = pedidosCache.find(pd=>pd.id===id);
   const data = await apiPost('aceitarPedido', { id }).catch(()=>({ok:false}));
   if(!data.ok){ if(restaurar) restaurar(); alert(data.erro || 'Não foi possível aceitar agora.'); return; }
@@ -632,6 +573,17 @@ async function aceitarPedido(id, btn){
   mudarAba('checklist');
 }
 
+// Cancela um pedido (novo ou aceito). Não apaga a linha da planilha —
+// só muda o status pra "cancelado", pra manter o histórico/auditoria e
+// pra sumir sozinho das abas Pedidos e Checklist e do Financeiro.
+async function cancelarPedido(id, btn){
+  if(!confirm('Cancelar este pedido? Essa ação não pode ser desfeita.')) return;
+  const restaurar = setBtnLoading_(btn, '');
+  const data = await apiPost('cancelarPedido', { id }).catch(()=>({ok:false}));
+  if(!data.ok){ if(restaurar) restaurar(); alert(data.erro || 'Não foi possível cancelar agora.'); return; }
+  await atualizarTudo();
+}
+
 /* ---------- ABA CHECKLIST ---------- */
 function carregarChecklistState_(){
   try{ checklistState = JSON.parse(localStorage.getItem('douratta_checklist_state_v1')||'{}'); }catch(e){ checklistState = {}; }
@@ -639,9 +591,6 @@ function carregarChecklistState_(){
 function salvarChecklistState_(){
   try{ localStorage.setItem('douratta_checklist_state_v1', JSON.stringify(checklistState)); }catch(e){}
 }
-// Link da página que o entregador vê ao escanear o QR Code do papel —
-// dados do pedido, rota, contato e QR Code Pix pra cobrar a entrega.
-// Formato: https://douratta.com.br/app/infopedido?pedido=ID_DO_PEDIDO
 function linkInfoPedido_(id){
   return `${INFOPEDIDO_URL_BASE}?pedido=${encodeURIComponent(String(id==null?'':id).trim())}`;
 }
@@ -649,13 +598,8 @@ function marcarChecklistItem(pedidoId, idx, checked){
   checklistState[pedidoId] = checklistState[pedidoId] || {};
   checklistState[pedidoId][idx] = checked;
   salvarChecklistState_();
-  renderChecklist(); // re-renderiza pra também atualizar se o botão "Finalizar checklist" já pode habilitar
+  renderChecklist();
 }
-// Monta o checklist em linhas GRANULARES: cada sabor, cada ingrediente
-// removido e cada adicional viram uma linha própria com checkbox — não
-// é só "2x Pizza Grande", é sabor por sabor, sem-isso, com-aquilo, pra
-// quem está montando não perder nada. Linhas com titulo:true são só
-// cabeçalho (sem checkbox, não contam pro total de itens a marcar).
 function checklistLinhasDoPedido(p){
   const linhas = [];
   (p.itens||[]).forEach(it=>{
@@ -680,10 +624,8 @@ function checklistLinhasDoPedido(p){
   });
   return linhas;
 }
-// Cada etapa sabe: qual o rótulo, qual ação chamar pra passar pra
-// PRÓXIMA etapa, o texto do botão e o ícone (Material Symbols).
 const STATUS_INFO_ = {
-  aceito:     { label:'Aceito',          proximaAcao:'iniciarPreparo',    botao:'Iniciar preparo',       icone:'outdoor_grill' },
+  aceito:     { label:'Aceito',          proximaAcao:'iniciarPreparo',    botao:'Iniciar preparo',      icone:'outdoor_grill' },
   em_preparo: { label:'Preparando',      proximaAcao:'confirmarChecklist',botao:'Finalizar checklist',   icone:'task_alt' },
   finalizado: { label:'Finalizado',      proximaAcao:'saiuParaEntrega',   botao:'Saiu para entrega',     icone:'local_shipping' },
   em_rota:    { label:'Saiu p/ entrega', proximaAcao:'marcarEntregue',    botao:'Marcar como entregue',  icone:'done_all' },
@@ -691,16 +633,14 @@ const STATUS_INFO_ = {
 };
 function renderChecklist(){
   const hojeStr = new Date().toDateString();
-  const doDia = pedidosCache.filter(p=>p.status!=='novo' && new Date(p.dataHora).toDateString()===hojeStr);
+  // "cancelado" não entra aqui — pedido cancelado some do checklist.
+  const doDia = pedidosCache.filter(p=>p.status!=='novo' && p.status!=='cancelado' && new Date(p.dataHora).toDateString()===hojeStr);
   const el = document.getElementById('tabChecklist');
   if(!doDia.length){ el.innerHTML = '<div class="empty-note">Nenhum pedido aceito hoje ainda.</div>'; return; }
   el.innerHTML = `<div class="grid">${doDia.map(p=>{
     const info = STATUS_INFO_[p.status] || STATUS_INFO_.aceito;
     const estado = checklistState[p.id] || {};
 
-    // O checklist granular (com os checkboxes) só é mostrado durante o
-    // preparo (em_preparo). Antes disso ainda não tem o que marcar;
-    // depois disso já foi conferido, não precisa mostrar de novo.
     let corpoHtml = '';
     let podeAvancar = true;
     if(p.status === 'em_preparo'){
@@ -756,63 +696,275 @@ async function carregarPontuacao(){
   </tbody></table>`;
 }
 
-/* ---------- ABA CARDÁPIO ---------- */
-let cardapioCache = { MENU:{}, CATS:[] };
+/* ---------- ABA CARDÁPIO (gestão completa: criar, editar, excluir) ---------- */
+let cardapioCache = { CATS:[], produtos:[] };
+let cardapioAbrirId = null; // id do produto cuja linha está expandida pra edição
+let cardapioNovoAberto = false;
+
 async function carregarCardapio(){
   const el = document.getElementById('tabCardapio');
   el.innerHTML = '<div class="loading-note">Carregando…</div>';
   const data = await apiPost('listarProdutosAdmin', {}).catch(()=>({ok:false}));
   if(!data.ok){ el.innerHTML = `<div class="empty-note">${data.erro||'Não foi possível carregar o cardápio agora.'}</div>`; return; }
-  cardapioCache.MENU = data.MENU || {};
   cardapioCache.CATS = data.CATS || [];
+  cardapioCache.produtos = data.produtos || [];
   renderCardapioEdit();
 }
+
+function catOptionsHtml_(categoriaSelecionada){
+  return cardapioCache.CATS.map(c=>`<option value="${c.id}" ${c.id===categoriaSelecionada?'selected':''}>${c.label||c.id}</option>`).join('');
+}
+
+function campoPrecoHtml_(tipo, prefixo, p){
+  p = p || {};
+  if(tipo === 'simples'){
+    return `<div class="pfield"><label>Preço</label><input type="number" step="0.5" id="${prefixo}-preco_unico" value="${p.precoUnico ?? ''}"></div>`;
+  }
+  if(tipo === 'bebida'){
+    return `<div class="pgrid">
+      <div class="pfield"><label>Preço</label><input type="number" step="0.5" id="${prefixo}-preco_unico" value="${p.precoUnico ?? ''}"></div>
+      <div class="pfield"><label>Volume (ex.: 350ml)</label><input id="${prefixo}-volume" value="${p.volume ?? ''}"></div>
+    </div>`;
+  }
+  // pizza (padrão)
+  return `<div class="pgrid">
+    <div class="pfield"><label>Broto</label><input type="number" step="0.5" id="${prefixo}-preco_broto" value="${p.precoBroto ?? ''}"></div>
+    <div class="pfield"><label>Média</label><input type="number" step="0.5" id="${prefixo}-preco_media" value="${p.precoMedia ?? ''}"></div>
+    <div class="pfield"><label>Grande</label><input type="number" step="0.5" id="${prefixo}-preco_grande" value="${p.precoGrande ?? ''}"></div>
+    <div class="pfield"><label>Família</label><input type="number" step="0.5" id="${prefixo}-preco_familia" value="${p.precoFamilia ?? ''}"></div>
+  </div>`;
+}
+
 function renderCardapioEdit(){
   const el = document.getElementById('tabCardapio');
-  el.innerHTML = `<p style="font-size:0.8rem;opacity:.65;margin-bottom:16px;">Ajuste rápido de preços e disponibilidade. Pra criar produto novo, trocar fotos ou ingredientes, edite direto na planilha.</p>` +
-    cardapioCache.CATS.map(cat=>{
-      const itens = cardapioCache.MENU[cat.id] || [];
-      if(!itens.length) return '';
-      const tipoPizza = cat.tipo === 'pizza';
-      return `<div class="cat-block"><h3>${cat.label||cat.id}</h3>
-        ${itens.map(p=>`
-          <div class="prod-edit-row" id="prow-${p.id}">
-            <div class="nome">${p.name}</div>
-            ${tipoPizza ? `
-              <div class="mini-field"><label>Broto</label><input type="number" step="0.5" id="pf-${p.id}-broto" value="${p.sizes?.broto ?? ''}"></div>
-              <div class="mini-field"><label>Média</label><input type="number" step="0.5" id="pf-${p.id}-media" value="${p.sizes?.media ?? ''}"></div>
-              <div class="mini-field"><label>Grande</label><input type="number" step="0.5" id="pf-${p.id}-grande" value="${p.sizes?.grande ?? ''}"></div>
-              <div class="mini-field"><label>Família</label><input type="number" step="0.5" id="pf-${p.id}-familia" value="${p.sizes?.familia ?? ''}"></div>
-            ` : `
-              <div class="mini-field"><label>Preço</label><input type="number" step="0.5" id="pf-${p.id}-unico" value="${p.price ?? ''}"></div>
-            `}
-            <label class="toggle-ativo"><input type="checkbox" id="pf-${p.id}-ativo" ${p.ativo===false?'':'checked'}> Ativo</label>
-            <button class="btn-salvar-prod" onclick="salvarProduto('${p.id}', ${tipoPizza}, this)">Salvar</button>
+  const porCategoria = {};
+  cardapioCache.produtos.forEach(p=>{ (porCategoria[p.categoriaId] = porCategoria[p.categoriaId] || []).push(p); });
+
+  const formNovo = cardapioNovoAberto ? `
+    <div class="novo-produto-card">
+      <h3>Novo produto</h3>
+      <div class="pgrid">
+        <div class="pfield" style="grid-column:1/-1;"><label>Nome</label><input id="np-nome" placeholder="Ex.: Quatro Queijos"></div>
+        <div class="pfield"><label>Categoria</label><select id="np-categoria_id" onchange="renderCardapioEdit()">${catOptionsHtml_(window.__npCat||'')}</select></div>
+        <div class="pfield"><label>Tempo de preparo</label><input id="np-tempo_preparo" placeholder="Ex.: 30–35 min"></div>
+      </div>
+      <div class="pfield"><label>Descrição</label><textarea id="np-descricao"></textarea></div>
+      <div class="pfield"><label>Ingredientes (separados por vírgula)</label><input id="np-ingredientes" placeholder="Molho de tomate, Muçarela, ..."></div>
+      <div class="pgrid">
+        <div class="pfield"><label>Imagem (URL)</label><input id="np-imagem_url"></div>
+        <div class="pfield"><label>Imagem 2 (opcional)</label><input id="np-imagem_url_2"></div>
+        <div class="pfield"><label>Imagem 3 (opcional)</label><input id="np-imagem_url_3"></div>
+      </div>
+      <div id="np-precos">${campoPrecoHtml_(tipoDaCategoria_(document.getElementById('np-categoria_id')?.value), 'np')}</div>
+      <div class="prow-actions">
+        <button class="btn-salvar-prod" onclick="criarProduto(this)">Criar produto</button>
+        <button class="btn-excluir-prod" style="background:var(--avorio-dark);color:var(--carvao);" onclick="cardapioNovoAberto=false;renderCardapioEdit();">Cancelar</button>
+      </div>
+    </div>` : `<button class="btn-novo-produto" onclick="cardapioNovoAberto=true;renderCardapioEdit();"><span class="material-symbols-outlined">add</span> Novo produto</button>`;
+
+  el.innerHTML = formNovo + cardapioCache.CATS.map(cat=>{
+    const itens = porCategoria[cat.id] || [];
+    if(!itens.length) return '';
+    return `<div class="cat-block"><h3>${cat.label||cat.id}</h3>
+      ${itens.map(p=>{
+        const aberto = cardapioAbrirId === p.id;
+        return `<div class="prod-edit-row ${aberto?'open':''}" id="prow-${p.id}">
+          <div class="ph" onclick="cardapioAbrirId = cardapioAbrirId==='${p.id}'?null:'${p.id}'; renderCardapioEdit();">
+            <div class="nome">${p.nome}${p.ativo===false?'<span class="inativo-tag">INATIVO</span>':''}</div>
+            <span class="material-symbols-outlined">${aberto?'expand_less':'expand_more'}</span>
           </div>
-        `).join('')}
+          ${aberto ? `<div class="pbody">
+            <div class="pfield"><label>Nome</label><input id="pf-${p.id}-nome" value="${escapAttr_(p.nome)}"></div>
+            <div class="pfield"><label>Categoria</label><select id="pf-${p.id}-categoria_id">${catOptionsHtml_(p.categoriaId)}</select></div>
+            <div class="pfield"><label>Descrição</label><textarea id="pf-${p.id}-descricao">${escapAttr_(p.descricao)}</textarea></div>
+            <div class="pfield"><label>Ingredientes (separados por vírgula)</label><input id="pf-${p.id}-ingredientes" value="${escapAttr_(p.ingredientesTexto)}"></div>
+            <div class="pgrid">
+              <div class="pfield"><label>Imagem (URL)</label><input id="pf-${p.id}-imagem_url" value="${escapAttr_(p.imagemUrl)}"></div>
+              <div class="pfield"><label>Imagem 2</label><input id="pf-${p.id}-imagem_url_2" value="${escapAttr_(p.imagemUrl2)}"></div>
+              <div class="pfield"><label>Imagem 3</label><input id="pf-${p.id}-imagem_url_3" value="${escapAttr_(p.imagemUrl3)}"></div>
+            </div>
+            <div class="pfield"><label>Tempo de preparo</label><input id="pf-${p.id}-tempo_preparo" value="${escapAttr_(p.tempoPreparo)}"></div>
+            ${campoPrecoHtml_(p.tipo, `pf-${p.id}`, p)}
+            <label class="toggle-ativo"><input type="checkbox" id="pf-${p.id}-ativo" ${p.ativo===false?'':'checked'}> Ativo (aparece no cardápio)</label>
+            <div class="prow-actions">
+              <button class="btn-salvar-prod" onclick="salvarProduto('${p.id}', '${p.tipo}', this)">Salvar alterações</button>
+              <button class="btn-excluir-prod" onclick="excluirProduto('${p.id}', this)">Excluir produto</button>
+            </div>
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+
+function tipoDaCategoria_(categoriaId){
+  const cat = cardapioCache.CATS.find(c=>c.id===categoriaId);
+  return cat ? cat.tipo : 'pizza';
+}
+function escapAttr_(s){ return String(s==null?'':s).replace(/"/g,'&quot;'); }
+
+function lerCamposPreco_(tipo, prefixo){
+  const campos = {};
+  const v = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+  if(tipo === 'simples'){
+    campos.preco_unico = v(`${prefixo}-preco_unico`);
+  } else if(tipo === 'bebida'){
+    campos.preco_unico = v(`${prefixo}-preco_unico`);
+    campos.volume = v(`${prefixo}-volume`);
+  } else {
+    campos.preco_broto = v(`${prefixo}-preco_broto`);
+    campos.preco_media = v(`${prefixo}-preco_media`);
+    campos.preco_grande = v(`${prefixo}-preco_grande`);
+    campos.preco_familia = v(`${prefixo}-preco_familia`);
+  }
+  return campos;
+}
+
+async function salvarProduto(id, tipo, btn){
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const campos = Object.assign({
+    nome: document.getElementById(`pf-${id}-nome`).value,
+    categoria_id: document.getElementById(`pf-${id}-categoria_id`).value,
+    descricao: document.getElementById(`pf-${id}-descricao`).value,
+    ingredientes: document.getElementById(`pf-${id}-ingredientes`).value,
+    imagem_url: document.getElementById(`pf-${id}-imagem_url`).value,
+    imagem_url_2: document.getElementById(`pf-${id}-imagem_url_2`).value,
+    imagem_url_3: document.getElementById(`pf-${id}-imagem_url_3`).value,
+    tempo_preparo: document.getElementById(`pf-${id}-tempo_preparo`).value,
+    ativo: document.getElementById(`pf-${id}-ativo`).checked
+  }, lerCamposPreco_(tipo, `pf-${id}`));
+  const data = await apiPost('atualizarProduto', { id, campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível salvar agora.'); return; }
+  await carregarCardapio();
+}
+
+async function excluirProduto(id, btn){
+  if(!confirm('Excluir este produto definitivamente? Essa ação não pode ser desfeita (diferente de desativar).')) return;
+  const restaurar = setBtnLoading_(btn, 'Excluindo...');
+  const data = await apiPost('excluirProduto', { id }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível excluir agora.'); return; }
+  cardapioAbrirId = null;
+  await carregarCardapio();
+}
+
+async function criarProduto(btn){
+  const categoriaId = document.getElementById('np-categoria_id').value;
+  const tipo = tipoDaCategoria_(categoriaId);
+  const campos = Object.assign({
+    nome: document.getElementById('np-nome').value,
+    categoria_id: categoriaId,
+    descricao: document.getElementById('np-descricao').value,
+    ingredientes: document.getElementById('np-ingredientes').value,
+    imagem_url: document.getElementById('np-imagem_url').value,
+    imagem_url_2: document.getElementById('np-imagem_url_2').value,
+    imagem_url_3: document.getElementById('np-imagem_url_3').value,
+    tempo_preparo: document.getElementById('np-tempo_preparo').value
+  }, lerCamposPreco_(tipo, 'np'));
+  if(!campos.nome.trim()){ alert('Dê um nome ao produto.'); return; }
+  const restaurar = setBtnLoading_(btn, 'Criando...');
+  const data = await apiPost('criarProduto', { campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível criar agora.'); return; }
+  cardapioNovoAberto = false;
+  await carregarCardapio();
+}
+
+/* ---------- ABA BAIRROS (taxa de entrega) ---------- */
+let bairrosCache = [];
+let bairroNovoAberto = false;
+let bairroEditandoNome = null;
+
+async function carregarBairros(){
+  const el = document.getElementById('tabBairros');
+  el.innerHTML = '<div class="loading-note">Carregando…</div>';
+  const data = await apiPost('listarBairrosAdmin', {}).catch(()=>({ok:false}));
+  if(!data.ok){ el.innerHTML = `<div class="empty-note">${data.erro||'Não foi possível carregar os bairros agora.'}</div>`; return; }
+  bairrosCache = data.bairros || [];
+  renderBairros();
+}
+
+function renderBairros(){
+  const el = document.getElementById('tabBairros');
+  const formNovo = bairroNovoAberto ? `
+    <div class="novo-bairro-card">
+      <h3>Novo bairro</h3>
+      <div class="pgrid">
+        <div class="pfield" style="grid-column:1/-1;"><label>Nome do bairro</label><input id="nb-nome" placeholder="Ex.: Santa Luzia"></div>
+        <div class="pfield"><label>Distância (km, só informativo)</label><input type="number" step="0.5" id="nb-distanciaKm"></div>
+        <div class="pfield"><label>Taxa de entrega (R$)</label><input type="number" step="0.5" id="nb-taxa"></div>
+      </div>
+      <div class="prow-actions">
+        <button class="btn-salvar-prod" onclick="criarBairro(this)">Criar bairro</button>
+        <button class="btn-excluir-prod" style="background:var(--avorio-dark);color:var(--carvao);" onclick="bairroNovoAberto=false;renderBairros();">Cancelar</button>
+      </div>
+    </div>` : `<button class="btn-novo-produto" onclick="bairroNovoAberto=true;renderBairros();"><span class="material-symbols-outlined">add</span> Novo bairro</button>`;
+
+  el.innerHTML = `<p style="font-size:0.8rem;opacity:.65;margin-bottom:16px;">Taxa de entrega fixa por bairro — é o valor cobrado quando o cliente escolhe esse bairro no cardápio.</p>${formNovo}` +
+    bairrosCache.map(b=>{
+      const editando = bairroEditandoNome === b.nome;
+      if(!editando){
+        return `<div class="bairro-row" id="brow-${slugEl_(b.nome)}">
+          <div class="nome">${b.nome}${b.ativo===false?'<span class="inativo-tag">INATIVO</span>':''}</div>
+          <div class="mini-field"><label>Taxa</label><div>${formatBRL(b.taxa)}</div></div>
+          <button class="btn-salvar-prod" onclick="bairroEditandoNome='${escapAttr_(b.nome)}';renderBairros();">Editar</button>
+        </div>`;
+      }
+      return `<div class="bairro-row" id="brow-${slugEl_(b.nome)}" style="flex-direction:column;align-items:stretch;">
+        <div class="pgrid">
+          <div class="pfield"><label>Nome</label><input id="bf-nome" value="${escapAttr_(b.nome)}"></div>
+          <div class="pfield"><label>Distância (km)</label><input type="number" step="0.5" id="bf-distanciaKm" value="${b.distanciaKm ?? ''}"></div>
+          <div class="pfield"><label>Taxa (R$)</label><input type="number" step="0.5" id="bf-taxa" value="${b.taxa ?? ''}"></div>
+        </div>
+        <label class="toggle-ativo"><input type="checkbox" id="bf-ativo" ${b.ativo===false?'':'checked'}> Ativo (aparece no cardápio)</label>
+        <div class="prow-actions">
+          <button class="btn-salvar-prod" onclick="salvarBairro('${escapAttr_(b.nome)}', this)">Salvar</button>
+          <button class="btn-excluir-prod" onclick="excluirBairro('${escapAttr_(b.nome)}', this)">Excluir bairro</button>
+          <button class="btn-excluir-prod" style="background:var(--avorio-dark);color:var(--carvao);" onclick="bairroEditandoNome=null;renderBairros();">Cancelar</button>
+        </div>
       </div>`;
     }).join('');
 }
-async function salvarProduto(id, tipoPizza, btn){
-  const restaurar = setBtnLoading_(btn, 'Salvando...');
-  const campos = { ativo: document.getElementById(`pf-${id}-ativo`).checked };
-  if(tipoPizza){
-    campos.preco_broto = document.getElementById(`pf-${id}-broto`).value;
-    campos.preco_media = document.getElementById(`pf-${id}-media`).value;
-    campos.preco_grande = document.getElementById(`pf-${id}-grande`).value;
-    campos.preco_familia = document.getElementById(`pf-${id}-familia`).value;
-  } else {
-    campos.preco_unico = document.getElementById(`pf-${id}-unico`).value;
-  }
-  const data = await apiPost('atualizarProduto', { id, campos }).catch(()=>({ok:false}));
+function slugEl_(s){ return String(s||'').replace(/[^a-zA-Z0-9]+/g,'-'); }
+
+async function criarBairro(btn){
+  const nome = document.getElementById('nb-nome').value.trim();
+  if(!nome){ alert('Dê um nome ao bairro.'); return; }
+  const restaurar = setBtnLoading_(btn, 'Criando...');
+  const data = await apiPost('criarBairro', {
+    nome,
+    distanciaKm: document.getElementById('nb-distanciaKm').value,
+    taxa: document.getElementById('nb-taxa').value
+  }).catch(()=>({ok:false}));
   if(restaurar) restaurar();
-  const row = document.getElementById(`prow-${id}`);
-  if(data.ok){
-    row.style.background = 'var(--verde-pale)';
-    setTimeout(()=>{ row.style.background=''; }, 900);
-  } else {
-    alert(data.erro || 'Não foi possível salvar agora.');
-  }
+  if(!data.ok){ alert(data.erro || 'Não foi possível criar agora.'); return; }
+  bairroNovoAberto = false;
+  await carregarBairros();
+}
+async function salvarBairro(nomeOriginal, btn){
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const data = await apiPost('atualizarBairro', {
+    nomeOriginal,
+    campos: {
+      nome: document.getElementById('bf-nome').value,
+      distanciaKm: document.getElementById('bf-distanciaKm').value,
+      taxa: document.getElementById('bf-taxa').value,
+      ativo: document.getElementById('bf-ativo').checked
+    }
+  }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível salvar agora.'); return; }
+  bairroEditandoNome = null;
+  await carregarBairros();
+}
+async function excluirBairro(nome, btn){
+  if(!confirm(`Excluir o bairro "${nome}"? Essa ação não pode ser desfeita.`)) return;
+  const restaurar = setBtnLoading_(btn, 'Excluindo...');
+  const data = await apiPost('excluirBairro', { nome }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível excluir agora.'); return; }
+  await carregarBairros();
 }
 
 /* ---------- ABA CONFIGURAÇÕES ---------- */
@@ -850,456 +1002,6 @@ async function alternarStatusLoja(){
   if(!data.ok){ alert(data.erro || 'Não foi possível atualizar agora.'); return; }
   configCache.aberto = typeof data.aberto === 'boolean' ? data.aberto : novoValor;
   renderConfiguracoes();
-}
-
-
-/* ---------- ABA CAÇA-NÍQUEL ---------- */
-let cacaCache = null, cacaProdutos = { MENU:{}, CATS:[] };
-const CACA_DIAS = [['dom','Dom'],['seg','Seg'],['ter','Ter'],['qua','Qua'],['qui','Qui'],['sex','Sex'],['sab','Sáb']];
-const CACA_ICONES = { D:'🏷️', F:'🛵', R:'🥤', S:'🍰', P:'🍕' };
-async function carregarCacaNiquel(){
-  const el = document.getElementById('tabCacaniquel');
-  el.innerHTML = '<div class="loading-note">Carregando…</div>';
-  const [d, p] = await Promise.all([
-    apiPost('cacaObterConfig', {}).catch(()=>({ok:false})),
-    apiPost('listarProdutosAdmin', {}).catch(()=>({ok:false}))
-  ]);
-  if(!d.ok){ el.innerHTML = `<div class="empty-note">${d.erro||'Não foi possível carregar agora. (Lembre de atualizar o Code.gs e gerar nova implantação.)'}</div>`; return; }
-  cacaCache = d;
-  if(p.ok) cacaProdutos = { MENU:p.MENU||{}, CATS:p.CATS||[] };
-  renderCacaNiquel();
-}
-function cacaSelectProduto_(id, atual){
-  const grupos = cacaProdutos.CATS.map(cat=>{
-    const itens = cacaProdutos.MENU[cat.id]||[];
-    if(!itens.length) return '';
-    return `<optgroup label="${cat.label||cat.id}">${itens.map(p=>`<option value="${p.id}" ${p.id===atual?'selected':''}>${p.name}${p.ativo===false?' (inativo)':''}</option>`).join('')}</optgroup>`;
-  }).join('');
-  return `<select id="${id}" class="caca-in"><option value="">— nenhum (vira desconto) —</option>${grupos}</select>`;
-}
-function renderCacaNiquel(){
-  const el = document.getElementById('tabCacaniquel');
-  const c = cacaCache.config;
-  const todos = String(c.diasSemana).trim().toLowerCase()==='todos' || !String(c.diasSemana).trim();
-  const dias = todos ? CACA_DIAS.map(d=>d[0]) : String(c.diasSemana).toLowerCase().split(/[\s,;]+/).map(x=>x.slice(0,3));
-  const seq = cacaCache.sequencia.split('');
-  const seqHtml = seq.map((l,i)=>`<span style="display:inline-block;padding:2px 3px;border-radius:6px;${i+1===cacaCache.posicao?'background:var(--dourado,#F9B31A);':''}">${CACA_ICONES[l]||l}</span>`).join('');
-  el.innerHTML = `<style>.caca-in{width:100%;padding:9px 10px;border:1.5px solid rgba(33,26,15,.2);border-radius:10px;font-size:.9rem;margin:4px 0 12px;background:#fff;}.caca-lb{font-size:.78rem;font-weight:700;display:block;}.caca-dias label{display:inline-flex;align-items:center;gap:3px;margin:0 8px 6px 0;font-size:.82rem;font-weight:600;}</style>
-    <div class="config-card">
-      <h3>Giro Premiado 🎁</h3>
-      <p class="sub">Quando ligado, o botão de enviar pedido abre a roleta de prêmios antes de ir pro WhatsApp. O prêmio já entra no pedido.</p>
-      <div class="loja-toggle-row">
-        <span class="loja-toggle-label ${!c.ativa?'ativo':''}">Desligado</span>
-        <button class="loja-toggle ${c.ativa?'on':''}" id="btnToggleCaca" onclick="alternarCaca()" role="switch" aria-checked="${c.ativa}">
-          <span class="loja-toggle-knob"></span>
-        </button>
-        <span class="loja-toggle-label ${c.ativa?'ativo':''}">Ligado</span>
-      </div>
-      <p class="sub" style="margin-top:12px;text-align:center;">${c.ativa ? (cacaCache.hojeAtiva?'✅ Aparecendo pros clientes hoje.':'⏸️ Ligado, mas hoje não é um dos dias escolhidos.') : 'Não aparece pros clientes.'}</p>
-
-      <div style="margin-top:18px;">
-        <span class="caca-lb">Dias da semana em que aparece</span>
-        <div class="caca-dias" style="margin:6px 0 10px;">
-          <label><input type="checkbox" id="cdTodos" ${todos?'checked':''} onchange="document.querySelectorAll('.cd-dia').forEach(x=>x.checked=this.checked)"> Todos</label>
-          ${CACA_DIAS.map(([k,l])=>`<label><input type="checkbox" class="cd-dia" value="${k}" ${dias.includes(k)?'checked':''} onchange="document.getElementById('cdTodos').checked=false"> ${l}</label>`).join('')}
-        </div>
-
-        <label class="caca-lb">% de desconto do prêmio</label>
-        <input class="caca-in" type="number" min="1" max="100" id="ccDesc" value="${c.descontoPct}">
-
-        <label class="caca-lb">Frete grátis só se o frete for até (R$)</label>
-        <input class="caca-in" type="number" min="0" step="0.5" id="ccFrete" value="${c.freteGratisMax}">
-
-        <label class="caca-lb">Refrigerante (prêmio)</label>
-        ${cacaSelectProduto_('ccRefri', c.produtoRefriId)}
-        <label class="caca-lb">Sobremesa (prêmio)</label>
-        ${cacaSelectProduto_('ccSobremesa', c.produtoSobremesaId)}
-        <label class="caca-lb">Pizza (prêmio)</label>
-        ${cacaSelectProduto_('ccPizza', c.produtoPizzaId)}
-
-        <label class="caca-lb">Tamanho da pizza-prêmio</label>
-        <input class="caca-in" id="ccTamPizza" value="${c.tamanhoPizza}">
-        <label class="caca-lb">Tamanho da sobremesa (se for pizza doce)</label>
-        <input class="caca-in" id="ccTamSobremesa" value="${c.tamanhoSobremesa}">
-
-        <label class="caca-lb">Pedidos com desconto antes de cada brinde</label>
-        <input class="caca-in" id="ccPadrao" value="${c.padraoDescontos}" style="margin-bottom:4px;">
-        <p class="sub" style="margin-bottom:12px;">Padrão 5,4,3,2 = 5 descontos → frete grátis → 4 descontos → refri → 3 descontos → sobremesa → 2 descontos → pizza → recomeça.</p>
-
-        <button class="btn-salvar-prod" style="width:100%;padding:12px;" onclick="salvarCacaNiquel(this)">Salvar configurações</button>
-      </div>
-
-      <div style="margin-top:18px;">
-        <span class="caca-lb">Fila de prêmios (você está na posição ${cacaCache.posicao} de ${seq.length})</span>
-        <div style="font-size:1.15rem;line-height:1.9;margin-top:4px;">${seqHtml}</div>
-        <p class="sub">🏷️ desconto · 🛵 frete grátis · 🥤 refri · 🍰 sobremesa · 🍕 pizza. O destacado é o próximo a sair.</p>
-      </div>
-    </div>`;
-}
-async function alternarCaca(){
-  const btn = document.getElementById('btnToggleCaca');
-  if(btn) btn.disabled = true;
-  const d = await apiPost('cacaSalvarConfig', { campos:{ ativa: !cacaCache.config.ativa } }).catch(()=>({ok:false}));
-  if(!d.ok){ if(btn) btn.disabled=false; alert(d.erro||'Não foi possível atualizar agora.'); return; }
-  cacaCache = d; renderCacaNiquel();
-}
-async function salvarCacaNiquel(btn){
-  const restaurar = setBtnLoading_(btn, 'Salvando...');
-  const todos = document.getElementById('cdTodos').checked;
-  const marcados = [...document.querySelectorAll('.cd-dia:checked')].map(x=>x.value);
-  const campos = {
-    diasSemana: (todos || !marcados.length) ? 'todos' : marcados.join(','),
-    descontoPct: Number(document.getElementById('ccDesc').value)||20,
-    freteGratisMax: Number(document.getElementById('ccFrete').value)||0,
-    produtoRefriId: document.getElementById('ccRefri').value,
-    produtoSobremesaId: document.getElementById('ccSobremesa').value,
-    produtoPizzaId: document.getElementById('ccPizza').value,
-    tamanhoPizza: document.getElementById('ccTamPizza').value.trim()||'Grande',
-    tamanhoSobremesa: document.getElementById('ccTamSobremesa').value.trim()||'Grande',
-    padraoDescontos: document.getElementById('ccPadrao').value.trim()||'5,4,3,2'
-  };
-  const d = await apiPost('cacaSalvarConfig', { campos }).catch(()=>({ok:false}));
-  if(restaurar) restaurar();
-  if(!d.ok){ alert(d.erro||'Não foi possível salvar agora.'); return; }
-  cacaCache = d; renderCacaNiquel();
-}
-
-
-/* ---------- ABA LIVE ---------- */
-let liveCache = null;
-function liveExtrairVideoId_(link){
-  const s = String(link||'').trim();
-  const m = s.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|live\/|embed\/))([A-Za-z0-9_-]{11})/);
-  return m ? m[1] : '';
-}
-async function carregarLive(){
-  const el = document.getElementById('tabLive');
-  el.innerHTML = '<div class="loading-note">Carregando…</div>';
-  const d = await apiPost('liveObterConfig', {}).catch(()=>({ok:false}));
-  if(!d.ok){ el.innerHTML = `<div class="empty-note">${d.erro||'Não foi possível carregar agora. (Lembre de atualizar o Code.gs e gerar nova implantação.)'}</div>`; return; }
-  liveCache = d;
-  renderLive();
-}
-function renderLive(){
-  const el = document.getElementById('tabLive');
-  const c = liveCache.config;
-  const videoId = liveExtrairVideoId_(c.link);
-  const linkValido = !!videoId;
-  el.innerHTML = `
-    <div class="config-card">
-      <h3>Live da cozinha 🔴</h3>
-      <p class="sub">Quando ligada, o cliente vê a transmissão ao vivo do YouTube na tela de acompanhar pedido, junto com o status. Cole o link da live abaixo (precisa estar AO VIVO no YouTube pra aparecer pra ele).</p>
-
-      <div class="loja-toggle-row">
-        <span class="loja-toggle-label ${!c.ativa?'ativo':''}">Desligada</span>
-        <button class="loja-toggle ${c.ativa?'on':''}" id="btnToggleLive" onclick="alternarLive()" role="switch" aria-checked="${c.ativa}" ${linkValido?'':'disabled'}>
-          <span class="loja-toggle-knob"></span>
-        </button>
-        <span class="loja-toggle-label ${c.ativa?'ativo':''}">Ligada</span>
-      </div>
-      <p class="sub" style="margin-top:12px;text-align:center;">${
-        !linkValido ? '⚠️ Cole um link de live do YouTube válido abaixo antes de ligar.'
-        : (c.ativa ? '✅ Aparecendo agora na tela de acompanhar pedido dos clientes.' : 'Não aparece pros clientes.')
-      }</p>
-
-      <div style="margin-top:18px;">
-        <label class="caca-lb">Link da live no YouTube</label>
-        <input class="caca-in" id="lvLink" placeholder="https://www.youtube.com/watch?v=XXXXXXXXXXX" value="${(c.link||'').replace(/"/g,'&quot;')}">
-        <p class="sub" style="margin:-6px 0 12px;">Aceita link de "assistir" (watch?v=), youtu.be/ ou /live/. Cole o link de qualquer um desses formatos.</p>
-
-        <button class="btn-salvar-prod" style="width:100%;padding:12px;" onclick="salvarLive(this)">Salvar link</button>
-      </div>
-
-      ${videoId ? `
-      <div style="margin-top:18px;">
-        <span class="caca-lb">Pré-visualização</span>
-        <div style="margin-top:8px;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:#000;">
-          <iframe width="100%" height="100%" style="display:block;border:0;" src="https://www.youtube.com/embed/${videoId}" title="Pré-visualização da live" allow="accelerometer; encrypted-media; gyroscope" allowfullscreen></iframe>
-        </div>
-      </div>` : ''}
-    </div>`;
-}
-async function alternarLive(){
-  const btn = document.getElementById('btnToggleLive');
-  if(btn) btn.disabled = true;
-  const d = await apiPost('liveSalvarConfig', { campos:{ ativa: !liveCache.config.ativa } }).catch(()=>({ok:false}));
-  if(!d.ok){ if(btn) btn.disabled=false; alert(d.erro||'Não foi possível atualizar agora.'); return; }
-  liveCache = d; renderLive();
-}
-async function salvarLive(btn){
-  const restaurar = setBtnLoading_(btn, 'Salvando...');
-  const link = document.getElementById('lvLink').value.trim();
-  const d = await apiPost('liveSalvarConfig', { campos:{ link } }).catch(()=>({ok:false}));
-  if(restaurar) restaurar();
-  if(!d.ok){ alert(d.erro||'Não foi possível salvar agora.'); return; }
-  liveCache = d; renderLive();
-}
-
-
-/* =========================================================
-   CUSTOS (calculadora + variáveis + fixos) e FINANCEIRO
-   ========================================================= */
-let cuDados=null, cuSub='calc', cuSel={alvo:'',tam:''}, cuLinhas=[], cuEditVar=null, cuBusca='', cuFixosEd=[];
-const CU_CATS=['Ingrediente','Tempero','Bebida (revenda)','Embalagem','Utilidade','Mão de obra','Transporte','Limpeza','Outros'];
-const CU_UNIDADES=['kg','g','L','ml','un','kWh','m³','h','min','km'];
-function cuEsc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function cuBRL(n,d){return 'R$ '+Number(n||0).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:d||2});}
-function cuN(v){const n=parseFloat(String(v==null?'':v).replace(',','.'));return isNaN(n)?0:n;}
-const CU_CSS=`<style>
-.cu-nav{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap;}
-.cu-nav button{padding:8px 14px;border-radius:99px;font-weight:700;font-size:.8rem;background:var(--bianco);border:1.5px solid var(--linha);}
-.cu-nav button.on{background:var(--carvao);color:#fff;border-color:var(--carvao);}
-.cu-card{background:var(--bianco);border-radius:16px;padding:16px;box-shadow:0 4px 16px rgba(33,26,15,.07);margin-bottom:14px;max-width:760px;}
-.cu-card h3{font-family:var(--font-display);font-size:1.05rem;margin-bottom:8px;}
-.cu-in{width:100%;padding:9px 10px;border:1.5px solid rgba(33,26,15,.2);border-radius:10px;font-size:.9rem;background:#fff;}
-.cu-lb{font-size:.74rem;font-weight:700;display:block;margin:10px 0 3px;}
-.cu-row{display:grid;grid-template-columns:1fr 84px 30px;gap:6px;align-items:center;margin-bottom:8px;}
-.cu-rowinfo{grid-column:1/-1;font-size:.72rem;opacity:.7;margin:-4px 0 4px;}
-.cu-sum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;}
-.cu-sum div{background:var(--avorio);border-radius:12px;padding:10px;}
-.cu-sum b{display:block;font-size:1.05rem;font-family:var(--font-mono);}
-.cu-sum span{font-size:.7rem;opacity:.7;}
-.cu-var{display:flex;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid var(--linha);cursor:pointer;font-size:.86rem;}
-.cu-var small{display:block;opacity:.65;font-size:.72rem;}
-.cu-cat{font-weight:800;font-size:.72rem;letter-spacing:.5px;text-transform:uppercase;opacity:.55;margin:14px 0 2px;}
-.cu-btn{background:var(--dourado);color:var(--carvao);padding:11px 16px;border-radius:10px;font-weight:800;font-size:.85rem;}
-.cu-btn.sec{background:var(--avorio-dark);}
-.cu-btn.red{background:var(--vermelho);color:#fff;}
-.cu-x{color:var(--vermelho);font-weight:800;font-size:1.1rem;}
-.cu-kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;max-width:760px;}
-.cu-kpi{background:var(--bianco);border-radius:14px;padding:12px;box-shadow:0 3px 12px rgba(33,26,15,.06);}
-.cu-kpi span{font-size:.7rem;opacity:.65;font-weight:700;}
-.cu-kpi b{display:block;font-size:1.15rem;font-family:var(--font-mono);margin-top:2px;}
-.cu-pos{color:var(--verde);} .cu-neg{color:var(--vermelho);}
-.cu-filtros{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
-.cu-filtros button{padding:7px 12px;border-radius:99px;font-size:.76rem;font-weight:700;background:var(--bianco);border:1.5px solid var(--linha);}
-.cu-filtros button.on{background:var(--dourado);border-color:var(--dourado-dark);}
-.cu-tbl{width:100%;border-collapse:collapse;font-size:.78rem;}
-.cu-tbl th,.cu-tbl td{padding:6px 4px;text-align:right;border-bottom:1px solid var(--linha);} .cu-tbl th:first-child,.cu-tbl td:first-child{text-align:left;}
-.cu-bar{height:10px;border-radius:5px;background:var(--dourado);}
-</style>`;
-
-async function carregarCustos(){
-  const el=document.getElementById('tabCustos');
-  el.innerHTML='<div class="loading-note">Carregando…</div>';
-  const d=await apiPost('custoObter',{}).catch(()=>({ok:false}));
-  if(!d.ok){el.innerHTML=`<div class="empty-note">${cuEsc(d.erro||'Não foi possível carregar. Atualize o Code.gs e gere uma nova implantação.')}</div>`;return;}
-  cuDados=d; if(cuSub==='calc'&&cuSel.alvo) cuCarregarLinhas(); renderCustos();
-}
-function cuTrocarSub(k){cuSub=k;cuEditVar=null;if(k==='fixos'){cuFixosEd=cuDados.fixos.map(f=>({...f}));}renderCustos();}
-function renderCustos(){
-  const el=document.getElementById('tabCustos');
-  const nav=[['calc','🧮 Calculadora'],['vars','📦 Variáveis'],['fixos','🏠 Fixos e taxas']].map(([k,l])=>`<button class="${cuSub===k?'on':''}" onclick="cuTrocarSub('${k}')">${l}</button>`).join('');
-  el.innerHTML=CU_CSS+`<div class="cu-nav">${nav}</div><div id="cuCorpo"></div>`;
-  if(cuSub==='calc') cuRenderCalc(); else if(cuSub==='vars') cuRenderVars(); else cuRenderFixos();
-}
-/* ---- Calculadora ---- */
-function cuAlvoAtual(){const [t,...r]=String(cuSel.alvo).split(':');const id=r.join(':');return cuDados.alvos.find(a=>a.tipo===t&&a.id===id)||null;}
-function cuCarregarLinhas(){
-  const a=cuAlvoAtual(); if(!a){cuLinhas=[];return;}
-  cuLinhas=cuDados.receitas.filter(r=>r.alvoTipo===a.tipo&&r.alvoId===a.id&&r.tamanho===cuSel.tam).map(r=>({variavelId:r.variavelId,quantidade:r.quantidade}));
-}
-function cuEscolherAlvo(v){cuSel.alvo=v;const a=cuAlvoAtual();cuSel.tam=a?a.tamanhos[0].key:'';cuCarregarLinhas();cuRenderCalc();}
-function cuEscolherTam(v){cuSel.tam=v;cuCarregarLinhas();cuRenderCalc();}
-function cuOptVars(sel){
-  const g={};cuDados.variaveis.filter(v=>v.ativo||v.id===sel).forEach(v=>{(g[v.categoria]=g[v.categoria]||[]).push(v);});
-  return '<option value="">— escolha a variável —</option>'+Object.keys(g).map(c=>`<optgroup label="${cuEsc(c)}">${g[c].map(v=>`<option value="${cuEsc(v.id)}" ${v.id===sel?'selected':''}>${cuEsc(v.nome)} (${cuEsc(v.unidade)})</option>`).join('')}</optgroup>`).join('');
-}
-function cuRenderCalc(){
-  const d=cuDados,c=document.getElementById('cuCorpo');
-  const gr={};d.alvos.forEach(a=>{(gr[a.grupo]=gr[a.grupo]||[]).push(a);});
-  const optA='<option value="">— escolha o produto —</option>'+Object.keys(gr).map(g=>`<optgroup label="${cuEsc(g)}">${gr[g].map(a=>`<option value="${a.tipo}:${cuEsc(a.id)}" ${cuSel.alvo===a.tipo+':'+a.id?'selected':''}>${cuEsc(a.nome)}${a.ativo?'':' (inativo)'}</option>`).join('')}</optgroup>`).join('');
-  const a=cuAlvoAtual();
-  let corpo='';
-  if(a){
-    const tamSel=a.tamanhos.length>1?`<label class="cu-lb">Tamanho</label><select class="cu-in" onchange="cuEscolherTam(this.value)">${a.tamanhos.map(t=>`<option value="${cuEsc(t.key)}" ${t.key===cuSel.tam?'selected':''}>${cuEsc(t.label)}${t.preco?' — venda '+cuBRL(t.preco):''}</option>`).join('')}</select>`:'';
-    corpo=`${tamSel}<label class="cu-lb">O que entra (na mesma unidade da variável)</label><div id="cuLinhas"></div>
-      <button class="cu-btn sec" style="width:100%;margin-top:4px;" onclick="cuAddLinha()">+ Adicionar variável</button>
-      <div class="cu-sum" id="cuTotais"></div>
-      <button class="cu-btn" style="width:100%;margin-top:14px;" onclick="cuSalvarReceita(this)">Salvar custo deste produto</button>`;
-  }
-  c.innerHTML=`<div class="cu-card"><h3>Calculadora de custo</h3><p style="font-size:.78rem;opacity:.7;margin-bottom:8px;">Escolha o produto e some as variáveis usadas (ex.: 0,2 kg de muçarela). O custo é salvo na aba Produtos e alimenta o Financeiro.</p>
-    <select class="cu-in" onchange="cuEscolherAlvo(this.value)">${optA}</select>${corpo}</div>`;
-  if(a) cuRenderLinhas();
-}
-function cuRenderLinhas(){
-  const box=document.getElementById('cuLinhas');
-  box.innerHTML=cuLinhas.map((l,i)=>{
-    const v=cuDados.variaveis.find(x=>x.id===l.variavelId);
-    return `<div class="cu-row"><select class="cu-in" onchange="cuLinhas[${i}].variavelId=this.value;cuRenderLinhas()">${cuOptVars(l.variavelId)}</select>
-      <input class="cu-in" type="number" step="any" min="0" inputmode="decimal" placeholder="${v?cuEsc(v.unidade):'qtd'}" value="${l.quantidade===''?'':l.quantidade}" oninput="cuLinhas[${i}].quantidade=cuN(this.value);cuAtualizarTotais()">
-      <button class="cu-x" onclick="cuLinhas.splice(${i},1);cuRenderLinhas()">✕</button>
-      <div class="cu-rowinfo" id="cuInfo${i}"></div></div>`;
-  }).join('')||'<p style="font-size:.8rem;opacity:.55;margin:6px 0;">Nenhuma variável ainda.</p>';
-  cuAtualizarTotais();
-}
-function cuAddLinha(){cuLinhas.push({variavelId:'',quantidade:''});cuRenderLinhas();}
-function cuAtualizarTotais(){
-  const d=cuDados;let total=0;
-  cuLinhas.forEach((l,i)=>{
-    const v=d.variaveis.find(x=>x.id===l.variavelId);const q=cuN(l.quantidade);const custo=v?q*v.custoEfetivo:0;total+=custo;
-    const info=document.getElementById('cuInfo'+i);if(!info)return;
-    if(!v){info.textContent='';return;}
-    let eq='';if(v.unidade==='kg')eq=` = ${(q*1000).toLocaleString('pt-BR')} g ·`;if(v.unidade==='L')eq=` = ${(q*1000).toLocaleString('pt-BR')} ml ·`;
-    info.textContent=`${eq} ${cuBRL(v.preco,4)}/${v.unidade}${v.desperdicio?' +'+v.desperdicio+'% desperdício':''} → ${cuBRL(custo,4)}`;
-  });
-  const a=cuAlvoAtual();const t=a?a.tamanhos.find(x=>x.key===cuSel.tam):null;const preco=t?t.preco:0;
-  const lucro=preco-total,marg=preco>0?lucro/preco*100:0;const md=cuN(d.config.margemDesejadaPct);
-  const sug=md<100?total/(1-md/100):0;
-  const el=document.getElementById('cuTotais');if(!el)return;
-  el.innerHTML=`<div><span>Custo total</span><b>${cuBRL(total)}</b></div><div><span>Preço de venda atual</span><b>${preco?cuBRL(preco):'—'}</b></div>
-    <div><span>Lucro por unidade</span><b class="${lucro>=0?'cu-pos':'cu-neg'}">${preco?cuBRL(lucro):'—'}</b></div><div><span>Margem</span><b class="${marg>=md?'cu-pos':'cu-neg'}">${preco?marg.toFixed(1)+'%':'—'}</b></div>
-    <div style="grid-column:1/-1"><span>Preço sugerido p/ margem de ${md}%</span><b>${total>0?cuBRL(sug):'—'}</b></div>`;
-}
-async function cuSalvarReceita(btn){
-  const a=cuAlvoAtual();if(!a)return;
-  const rest=setBtnLoading_(btn,'Salvando...');
-  const d=await apiPost('custoSalvarReceita',{alvoTipo:a.tipo,alvoId:a.id,tamanho:cuSel.tam,linhas:cuLinhas.filter(l=>l.variavelId)}).catch(()=>({ok:false}));
-  if(rest)rest();
-  if(!d.ok){alert(d.erro||'Não foi possível salvar.');return;}
-  cuDados=d;cuCarregarLinhas();cuRenderCalc();alert('Custo salvo!');
-}
-/* ---- Variáveis ---- */
-function cuRenderVars(){
-  const c=document.getElementById('cuCorpo');
-  if(cuEditVar){cuRenderFormVar(c);return;}
-  c.innerHTML=`<div class="cu-card"><div style="display:flex;gap:8px;"><input class="cu-in" placeholder="Buscar variável…" value="${cuEsc(cuBusca)}" oninput="cuBusca=this.value;cuRenderListaVars()"><button class="cu-btn" style="white-space:nowrap;" onclick="cuNovaVar()">+ Nova</button></div><div id="cuListaVars"></div></div>`;
-  cuRenderListaVars();
-}
-function cuRenderListaVars(){
-  const q=cuBusca.trim().toLowerCase(),g={};
-  cuDados.variaveis.filter(v=>!q||v.nome.toLowerCase().includes(q)||v.categoria.toLowerCase().includes(q)).forEach(v=>{(g[v.categoria]=g[v.categoria]||[]).push(v);});
-  document.getElementById('cuListaVars').innerHTML=Object.keys(g).map(cat=>`<div class="cu-cat">${cuEsc(cat)}</div>`+g[cat].map(v=>`<div class="cu-var" onclick="cuEditarVar('${cuEsc(v.id)}')" style="${v.ativo?'':'opacity:.45'}"><div><b>${cuEsc(v.nome)}</b><small>Estoque: ${v.estoque} ${cuEsc(v.unidade)} = ${cuBRL(v.valorEstoque)}${v.desperdicio?' · desperdício '+v.desperdicio+'%':''}</small></div><div style="text-align:right;font-family:var(--font-mono);">${v.preco?cuBRL(v.preco,4):'<span class="cu-neg">sem preço</span>'}<small>/ ${cuEsc(v.unidade)}</small></div></div>`).join('')).join('')||'<div class="empty-note">Nada encontrado.</div>';
-}
-function cuNovaVar(){cuEditVar={id:'',nome:'',categoria:'Ingrediente',unidade:'kg',preco:0,estoque:0,desperdicio:0,obs:'',ativo:true};cuRenderVars();}
-function cuEditarVar(id){cuEditVar={...cuDados.variaveis.find(v=>v.id===id)};cuRenderVars();}
-function cuRenderFormVar(c){
-  const v=cuEditVar;
-  const optC=[...new Set([...CU_CATS,v.categoria])].map(x=>`<option ${x===v.categoria?'selected':''}>${cuEsc(x)}</option>`).join('');
-  const optU=[...new Set([...CU_UNIDADES,v.unidade])].map(x=>`<option ${x===v.unidade?'selected':''}>${cuEsc(x)}</option>`).join('');
-  c.innerHTML=`<div class="cu-card"><h3>${v.id?'Editar':'Nova'} variável</h3>
-    <label class="cu-lb">Nome</label><input class="cu-in" id="fvNome" value="${cuEsc(v.nome)}">
-    <label class="cu-lb">Categoria</label><select class="cu-in" id="fvCat">${optC}</select>
-    <label class="cu-lb">Unidade de medida (a da compra)</label><select class="cu-in" id="fvUn">${optU}</select>
-    <label class="cu-lb">Valor por unidade (R$) — ex.: 13 por kg</label><input class="cu-in" id="fvPreco" type="number" step="any" inputmode="decimal" value="${v.preco}" oninput="cuFormCalc()">
-    <label class="cu-lb">Quantidade em estoque (na mesma unidade)</label><input class="cu-in" id="fvEst" type="number" step="any" inputmode="decimal" value="${v.estoque}" oninput="cuFormCalc()">
-    <label class="cu-lb">Desperdício / perda (%) — ex.: cebola 10</label><input class="cu-in" id="fvDesp" type="number" step="any" inputmode="decimal" value="${v.desperdicio}" oninput="cuFormCalc()">
-    <label class="cu-lb">Observação</label><input class="cu-in" id="fvObs" value="${cuEsc(v.obs)}">
-    <label class="cu-lb" style="display:flex;gap:8px;align-items:center;"><input type="checkbox" id="fvAtivo" ${v.ativo?'checked':''}> Ativa</label>
-    <div class="cu-sum"><div><span>Valor em estoque</span><b id="fvValEst">—</b></div><div><span>Custo real por unidade</span><b id="fvEf">—</b></div></div>
-    <div style="display:flex;gap:8px;margin-top:14px;"><button class="cu-btn" style="flex:1" onclick="cuSalvarVar(this)">Salvar</button><button class="cu-btn sec" onclick="cuEditVar=null;cuRenderVars()">Voltar</button>${v.id?'<button class="cu-btn red" onclick="cuExcluirVar()">Excluir</button>':''}</div></div>`;
-  cuFormCalc();
-}
-function cuFormCalc(){
-  const p=cuN(document.getElementById('fvPreco').value),e=cuN(document.getElementById('fvEst').value),d=Math.min(95,cuN(document.getElementById('fvDesp').value));
-  document.getElementById('fvValEst').textContent=cuBRL(p*e);document.getElementById('fvEf').textContent=cuBRL(p/(1-d/100),4);
-}
-async function cuSalvarVar(btn){
-  const v={...cuEditVar,nome:document.getElementById('fvNome').value.trim(),categoria:document.getElementById('fvCat').value,unidade:document.getElementById('fvUn').value,
-    preco:cuN(document.getElementById('fvPreco').value),estoque:cuN(document.getElementById('fvEst').value),desperdicio:cuN(document.getElementById('fvDesp').value),
-    obs:document.getElementById('fvObs').value,ativo:document.getElementById('fvAtivo').checked};
-  const rest=setBtnLoading_(btn,'Salvando...');
-  const d=await apiPost('custoSalvarVariavel',{variavel:v}).catch(()=>({ok:false}));
-  if(rest)rest();
-  if(!d.ok){alert(d.erro||'Não foi possível salvar.');return;}
-  cuDados=d;cuEditVar=null;cuRenderVars();
-}
-async function cuExcluirVar(){
-  if(!confirm('Excluir esta variável?'))return;
-  const d=await apiPost('custoExcluirVariavel',{id:cuEditVar.id}).catch(()=>({ok:false}));
-  if(!d.ok){alert(d.erro||'Não foi possível excluir.');return;}
-  cuDados=d;cuEditVar=null;cuRenderVars();
-}
-/* ---- Fixos e taxas ---- */
-function cuRenderFixos(){
-  const c=document.getElementById('cuCorpo'),cf=cuDados.config;
-  const campo=(k,l,dica)=>`<label class="cu-lb">${l}</label><input class="cu-in" type="number" step="any" inputmode="decimal" id="cp_${k}" value="${cf[k]}">${dica?`<div style="font-size:.7rem;opacity:.6;">${dica}</div>`:''}`;
-  c.innerHTML=`<div class="cu-card"><h3>Custos fixos mensais</h3><p style="font-size:.78rem;opacity:.7;margin-bottom:8px;">Aluguel, internet, salários... São divididos pelos pedidos estimados do mês (rateio por pedido).</p>
-    <div id="cuFixos"></div><button class="cu-btn sec" style="width:100%" onclick="cuFixosEd.push({id:'',nome:'',valor:0,ativo:true});cuDesenharFixos()">+ Adicionar custo fixo</button>
-    <div class="cu-sum"><div><span>Total fixo / mês</span><b id="cuFixTot">—</b></div><div><span>Rateio por pedido</span><b id="cuFixRat">—</b></div></div></div>
-    <div class="cu-card"><h3>Taxas e parâmetros</h3>
-    ${campo('pedidosMesEstimado','Pedidos estimados por mês')}${campo('taxaPixPct','Taxa do Pix (%)')}${campo('taxaCartaoPct','Taxa do cartão (%)')}${campo('impostoPct','Imposto sobre vendas (%)')}
-    ${campo('custoEntregaPorPedido','Custo de entrega por pedido (R$)','Gasolina + desgaste + motoboy, em média. Só entra em pedidos com frete.')}${campo('margemDesejadaPct','Margem de lucro desejada (%)','Usada no preço sugerido da calculadora.')}
-    <button class="cu-btn" style="width:100%;margin-top:14px;" onclick="cuSalvarParams(this)">Salvar</button></div>`;
-  cuDesenharFixos();
-}
-function cuDesenharFixos(){
-  document.getElementById('cuFixos').innerHTML=cuFixosEd.map((f,i)=>`<div class="cu-row" style="grid-template-columns:1fr 100px 30px;"><input class="cu-in" placeholder="Nome" value="${cuEsc(f.nome)}" oninput="cuFixosEd[${i}].nome=this.value"><input class="cu-in" type="number" step="any" inputmode="decimal" placeholder="R$/mês" value="${f.valor||''}" oninput="cuFixosEd[${i}].valor=cuN(this.value);cuTotFixos()"><button class="cu-x" onclick="cuFixosEd.splice(${i},1);cuDesenharFixos()">✕</button></div>`).join('');
-  cuTotFixos();
-}
-function cuTotFixos(){
-  const t=cuFixosEd.filter(f=>f.ativo!==false).reduce((s,f)=>s+cuN(f.valor),0);
-  const p=Math.max(1,cuN(document.getElementById('cp_pedidosMesEstimado')?.value||cuDados.config.pedidosMesEstimado));
-  document.getElementById('cuFixTot').textContent=cuBRL(t);document.getElementById('cuFixRat').textContent=cuBRL(t/p);
-}
-async function cuSalvarParams(btn){
-  const campos={};['pedidosMesEstimado','taxaPixPct','taxaCartaoPct','impostoPct','custoEntregaPorPedido','margemDesejadaPct'].forEach(k=>campos[k]=cuN(document.getElementById('cp_'+k).value));
-  const rest=setBtnLoading_(btn,'Salvando...');
-  const d=await apiPost('custoSalvarParametros',{fixos:cuFixosEd,campos}).catch(()=>({ok:false}));
-  if(rest)rest();
-  if(!d.ok){alert(d.erro||'Não foi possível salvar.');return;}
-  cuDados=d;cuFixosEd=d.fixos.map(f=>({...f}));cuRenderFixos();alert('Salvo!');
-}
-
-/* ---------- FINANCEIRO (dashboard) ---------- */
-let finF={preset:'30d',de:'',ate:'',agrupar:'dia'}, finDados=null;
-function finISO(d){const p=n=>String(n).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
-function finPeriodo(){
-  const h=new Date(),f=finF;let de=new Date(h),ate=new Date(h);
-  if(f.preset==='hoje'){}
-  else if(f.preset==='7d')de.setDate(h.getDate()-6);
-  else if(f.preset==='30d')de.setDate(h.getDate()-29);
-  else if(f.preset==='mes')de=new Date(h.getFullYear(),h.getMonth(),1);
-  else if(f.preset==='custom'&&f.de&&f.ate)return {de:f.de,ate:f.ate};
-  return {de:finISO(de),ate:finISO(ate)};
-}
-async function carregarFinanceiro(gravar){
-  const el=document.getElementById('tabFinanceiro');
-  if(!finDados) el.innerHTML='<div class="loading-note">Carregando…</div>';
-  const {de,ate}=finPeriodo();
-  const d=await apiPost('custoDashboard',{de,ate,agrupar:finF.agrupar,gravar:!!gravar}).catch(()=>({ok:false}));
-  if(!d.ok){el.innerHTML=`<div class="empty-note">${cuEsc(d.erro||'Não foi possível carregar. Atualize o Code.gs e gere uma nova implantação.')}</div>`;return;}
-  finDados=d;renderFinanceiro();
-  if(gravar)alert('Planilha atualizada! Veja as abas Margem_Pedidos e Margem_Resumo.');
-}
-function finSet(k,v){finF[k]=v;if(k==='preset'&&v!=='custom'){finDados=null;}carregarFinanceiro();}
-function finChart(serie){
-  if(!serie.length)return '<div class="empty-note">Sem pedidos no período.</div>';
-  const n=serie.length,bw=10,gap=6,gw=bw*3+gap+6,W=Math.max(320,n*gw+40),H=200,top=10,bot=34;
-  const maxV=Math.max(1,...serie.map(s=>Math.max(s.receita,s.custo,s.lucro))),minV=Math.min(0,...serie.map(s=>s.lucro));
-  const y=v=>top+(H-top-bot)*(1-(v-minV)/(maxV-minV));
-  const step=n>16?Math.ceil(n/12):1;
-  let g=`<line x1="30" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="#211A0F" stroke-opacity=".3"/>`;
-  serie.forEach((s,i)=>{
-    const x=34+i*gw;
-    [[s.receita,'#F9B31A'],[s.custo,'#D31A1B'],[s.lucro,'#2E8B45']].forEach(([v,c],j)=>{
-      const y0=y(0),y1=y(v);g+=`<rect x="${x+j*bw}" y="${Math.min(y0,y1)}" width="${bw-1}" height="${Math.max(1,Math.abs(y0-y1))}" fill="${c}" rx="2"/>`;
-    });
-    if(i%step===0)g+=`<text x="${x+bw*1.5}" y="${H-16}" font-size="9" text-anchor="middle" fill="#211A0F">${cuEsc(s.label)}</text>`;
-  });
-  g+=`<text x="2" y="${y(maxV)+8}" font-size="9" fill="#211A0F">${Math.round(maxV)}</text>`;
-  return `<div style="overflow-x:auto;"><svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${g}</svg></div>
-    <div style="font-size:.72rem;display:flex;gap:12px;margin-top:4px;"><span><i style="background:#F9B31A;display:inline-block;width:10px;height:10px;border-radius:2px"></i> Faturamento</span><span><i style="background:#D31A1B;display:inline-block;width:10px;height:10px;border-radius:2px"></i> Custo</span><span><i style="background:#2E8B45;display:inline-block;width:10px;height:10px;border-radius:2px"></i> Lucro</span></div>`;
-}
-function renderFinanceiro(){
-  const d=finDados,t=d.totais,el=document.getElementById('tabFinanceiro'),f=finF;
-  const pre=[['hoje','Hoje'],['7d','7 dias'],['30d','30 dias'],['mes','Este mês'],['custom','Período']].map(([k,l])=>`<button class="${f.preset===k?'on':''}" onclick="finSet('preset','${k}')">${l}</button>`).join('');
-  const agr=[['dia','Por dia'],['semana','Por semana'],['mes','Por mês']].map(([k,l])=>`<button class="${f.agrupar===k?'on':''}" onclick="finSet('agrupar','${k}')">${l}</button>`).join('');
-  const custom=f.preset==='custom'?`<div style="display:flex;gap:8px;margin-bottom:10px;max-width:420px;"><input class="cu-in" type="date" value="${f.de||d.de}" onchange="finF.de=this.value;finSet('preset','custom')"><input class="cu-in" type="date" value="${f.ate||d.ate}" onchange="finF.ate=this.value;finSet('preset','custom')"></div>`:'';
-  const comp=d.composicao,totC=Object.values(comp).reduce((a,b)=>a+b,0)||1;
-  const nomes={produtos:'Ingredientes e embalagens',entrega:'Entrega',taxas:'Taxas de pagamento',imposto:'Impostos',fixos:'Custos fixos (rateio)'};
-  const compHtml=Object.keys(comp).map(k=>`<div style="margin-bottom:8px;font-size:.8rem;"><div style="display:flex;justify-content:space-between;"><span>${nomes[k]}</span><b>${cuBRL(comp[k])} · ${(comp[k]/totC*100).toFixed(0)}%</b></div><div class="cu-bar" style="width:${Math.max(2,comp[k]/totC*100)}%"></div></div>`).join('');
-  const topHtml=d.top.map(p=>`<tr><td>${cuEsc(p.nome)}</td><td>${p.qtd}</td><td>${cuBRL(p.receita)}</td><td>${cuBRL(p.custo)}</td><td class="${p.lucro>=0?'cu-pos':'cu-neg'}">${cuBRL(p.lucro)}</td></tr>`).join('');
-  const alerta=t.semCusto?`<div class="cu-card" style="background:var(--dourado-pale);font-size:.82rem;">⚠️ ${t.semCusto} pedido(s) têm item sem custo cadastrado — o lucro deles está superestimado. Cadastre em <b>Custos → Calculadora</b>.</div>`:'';
-  el.innerHTML=CU_CSS+`<div class="cu-filtros">${pre}</div>${custom}<div class="cu-filtros">${agr}</div>${alerta}
-    <div class="cu-kpis"><div class="cu-kpi"><span>Faturamento</span><b>${cuBRL(t.receita)}</b></div><div class="cu-kpi"><span>Custo total</span><b>${cuBRL(t.custo)}</b></div>
-    <div class="cu-kpi"><span>Lucro</span><b class="${t.lucro>=0?'cu-pos':'cu-neg'}">${cuBRL(t.lucro)}</b></div><div class="cu-kpi"><span>Margem</span><b class="${t.margemPct>=0?'cu-pos':'cu-neg'}">${t.margemPct.toFixed(1)}%</b></div>
-    <div class="cu-kpi"><span>Pedidos</span><b>${t.pedidos}</b></div><div class="cu-kpi"><span>Ticket médio</span><b>${cuBRL(t.ticket)}</b></div></div>
-    <div class="cu-card"><h3>Evolução</h3>${finChart(d.serie)}</div>
-    <div class="cu-card"><h3>Para onde vai o custo</h3>${compHtml}</div>
-    <div class="cu-card"><h3>Produtos mais vendidos</h3><div style="overflow-x:auto;"><table class="cu-tbl"><tr><th>Item</th><th>Qtd</th><th>Receita</th><th>Custo</th><th>Lucro</th></tr>${topHtml||'<tr><td colspan="5">Sem dados</td></tr>'}</table></div></div>
-    <button class="cu-btn sec" style="max-width:760px;width:100%;" onclick="carregarFinanceiro(true)">📄 Gravar balanço na planilha</button>
-    <p style="font-size:.7rem;opacity:.55;margin-top:8px;max-width:760px;">Conta só pedidos aceitos em diante. Lucro = total pago − ingredientes − entrega − taxas − impostos − rateio dos custos fixos.</p>`;
 }
 
 /* ---------- início ---------- */
