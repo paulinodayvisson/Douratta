@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -61,6 +60,47 @@
   --shadow-lift:0 24px 60px rgba(28,26,23,0.18);
   --ease:cubic-bezier(.25,.46,.45,.94);
 }
+
+/* =========================================================
+   LOJA FECHADA — tela cheia mostrada no lugar do cardápio
+   quando o painel administrativo marca a loja como fechada
+   (aba Config, chave "aberto"). Fica por cima de tudo e
+   impede o acesso ao cardápio até reabrir.
+   ========================================================= */
+#lojaFechadaScreen{
+  display:none;position:fixed;inset:0;z-index:9999;
+  background:linear-gradient(160deg,var(--carvao) 0%,var(--carvao-soft) 100%);
+  color:var(--avorio);
+  flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:32px 22px;
+}
+#lojaFechadaScreen.show{display:flex;}
+.lf-icon{
+  width:76px;height:76px;border-radius:50%;
+  background:var(--vermelho);display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;box-shadow:0 10px 30px rgba(211,26,27,0.35);
+}
+.lf-icon svg{width:36px;height:36px;}
+.lf-title{
+  font-family:var(--font-display);font-weight:600;font-size:1.9rem;
+  margin-bottom:10px;max-width:480px;
+}
+.lf-copy{
+  font-size:0.98rem;opacity:0.82;max-width:420px;line-height:1.55;margin-bottom:6px;
+}
+.lf-horario{
+  font-size:0.88rem;opacity:0.65;margin-bottom:26px;
+}
+.lf-horario b{color:var(--dourado);font-weight:700;}
+.lf-wpp-btn{
+  display:inline-flex;align-items:center;gap:10px;
+  background:#25D366;color:#fff;font-weight:700;font-size:0.95rem;
+  padding:15px 26px;border-radius:var(--radius-pill);text-decoration:none;
+  box-shadow:0 10px 26px rgba(37,211,102,0.3);
+}
+.lf-wpp-btn svg{width:20px;height:20px;flex-shrink:0;}
+.lf-wpp-btn:active{transform:scale(0.97);}
+.lf-foot{margin-top:28px;font-size:0.76rem;opacity:0.45;}
 
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;font-size:16px;}
@@ -843,6 +883,25 @@ footer.brand-footer .fs{font-size:0.72rem;color:var(--carvao-soft);opacity:0.4;m
 </head>
 <body>
 <!-- =========================================================
+     LOJA FECHADA — ver CSS #lojaFechadaScreen acima. Conteúdo é
+     preenchido por renderLojaFechada() quando CONFIG.aberto é
+     false (ver loadMenuData()).
+     ========================================================= -->
+<div id="lojaFechadaScreen">
+  <div class="lf-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 7v5l3 3"/></svg>
+  </div>
+  <div class="lf-title">Ops, estamos fechados no momento!</div>
+  <div class="lf-copy" id="lfCopy">Mas a pizza mais gostosa da cidade volta a esquentar o forno em breve. Chama a gente no WhatsApp pra saber o horário ou deixar seu pedido reservado.</div>
+  <div class="lf-horario" id="lfHorario"></div>
+  <a class="lf-wpp-btn" id="lfWppBtn" href="#" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 3.5A11 11 0 0 0 2.7 17.2L2 22l4.9-1.3A11 11 0 1 0 20.5 3.5zm-8.5 17a9 9 0 0 1-4.6-1.3l-.3-.2-3.1.8.8-3-.2-.3A9 9 0 1 1 12 20.5z"/></svg>
+    Chamar no WhatsApp
+  </a>
+  <div class="lf-foot">Douratta Pizzaria</div>
+</div>
+
+<!-- =========================================================
      SPLASH SCREEN (aparece antes de tudo, ~3s)
      ========================================================= -->
 <div class="bg-pattern-layer" id="bgPatternLayer" aria-hidden="true"></div>
@@ -1318,6 +1377,26 @@ function addonsForCategory(catId){
 function catType(catId){ return catInfo(catId)?.tipo || 'pizza'; }
 function firstFlavorCount(){ return (FLAVOR_COUNTS[0] && FLAVOR_COUNTS[0].n) || 1; }
 
+/* =========================================================
+   LOJA FECHADA — mostra a tela cheia (ver #lojaFechadaScreen no
+   <body> e seu CSS lá em cima) no lugar do cardápio quando o
+   painel administrativo marcou a loja como fechada. Chamada por
+   loadMenuData() assim que CONFIG chega com aberto === false.
+   ========================================================= */
+function renderLojaFechada(){
+  const horario = String(CONFIG.horarioFuncionamento || '').trim();
+  const horarioEl = document.getElementById('lfHorario');
+  if (horarioEl) {
+    horarioEl.innerHTML = horario ? `Funcionamos <b>${horario}</b>` : '';
+  }
+  const telefone = String(CONFIG.whatsappNumber || '').replace(/\D/g, '');
+  const msg = encodeURIComponent('Oi! Vi que a Douratta está fechada agora — queria saber o horário de funcionamento :)');
+  const wppBtn = document.getElementById('lfWppBtn');
+  if (wppBtn) wppBtn.href = telefone ? `https://wa.me/${telefone}?text=${msg}` : '#';
+  const screen = document.getElementById('lojaFechadaScreen');
+  if (screen) screen.classList.add('show');
+}
+
 async function loadMenuData(){
   try{
     // cache:'no-store' + parâmetro com timestamp = garante que o navegador
@@ -1339,6 +1418,11 @@ async function loadMenuData(){
       return renderApp_();
     }
     CONFIG = Object.assign(CONFIG, data.CONFIG || {});
+    // "aberto" vem da aba Config (chave "aberto") já convertido pra
+    // booleano de verdade pelo backend — só mostra a tela de loja
+    // fechada quando o valor existe e é explicitamente false (não
+    // trava o cardápio se a chave nunca foi criada na planilha).
+    if (CONFIG.aberto === false) { renderLojaFechada(); }
     SIZES = data.SIZES || [];
     CRUSTS = data.CRUSTS || [];
     ADDONS = data.ADDONS || [];
