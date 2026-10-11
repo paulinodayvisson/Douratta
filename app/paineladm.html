@@ -148,6 +148,19 @@ table td.mono{font-family:var(--font-mono);}
 .novo-form .dica{font-size:0.7rem;opacity:.6;margin-top:3px;}
 .novo-form .chk{display:flex;align-items:center;gap:6px;margin-top:12px;font-size:0.82rem;font-weight:600;opacity:1;}
 .prod-edit-row .mini-field input.txt{width:96px;}
+
+.btn-edit-prod{background:var(--carvao);color:#fff;padding:8px 12px;border-radius:9px;font-weight:700;font-size:0.75rem;}
+.btn-excl-prod{background:#fff;color:#B3261E;border:1.5px solid #B3261E;padding:7px 12px;border-radius:9px;font-weight:700;font-size:0.75rem;}
+.modal-bg{position:fixed;inset:0;background:rgba(33,26,15,.55);z-index:999;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 12px;}
+.modal-bg.aberto{display:flex;}
+.modal-box{background:var(--bianco);border-radius:18px;padding:18px;width:100%;max-width:560px;margin:auto;}
+.modal-box h3{font-family:var(--font-display);font-size:1.1rem;margin-bottom:6px;}
+.modal-box label{display:block;font-size:0.72rem;font-weight:700;margin:10px 0 3px;opacity:.75;}
+.modal-box input[type=text],.modal-box select,.modal-box textarea{width:100%;padding:9px 10px;border:1.5px solid var(--linha);border-radius:9px;font-size:0.88rem;background:#fff;}
+.modal-box .linha2{display:flex;gap:8px;flex-wrap:wrap;}
+.modal-box .linha2>div{flex:1;min-width:110px;}
+.modal-box .acoes{display:flex;gap:8px;margin-top:16px;}
+.modal-box .acoes button{flex:1;padding:12px;border-radius:10px;font-weight:700;}
 .btn-salvar-prod{background:var(--dourado);color:var(--carvao);padding:8px 14px;border-radius:9px;font-weight:700;font-size:0.75rem;}
 
 .empty-note{text-align:center;padding:40px 10px;opacity:.5;font-size:0.88rem;}
@@ -274,6 +287,7 @@ table td.mono{font-family:var(--font-mono);}
     <div class="tab-panel active" id="tabPedidos"><div class="loading-note">Carregando pedidos…</div></div>
     <div class="tab-panel" id="tabChecklist"><div class="loading-note">Carregando checklist…</div></div>
     <div class="tab-panel" id="tabPontuacao"><div class="loading-note">Carregando pontuação…</div></div>
+    <div class="modal-bg" id="modalProduto" onclick="if(event.target===this)fecharEditarProduto()"><div class="modal-box" id="modalProdutoBox"></div></div>
     <div class="tab-panel" id="tabCardapio"><div class="loading-note">Carregando cardápio…</div></div>
     <div class="tab-panel" id="tabCacaniquel"><div class="loading-note">Carregando…</div></div>
     <div class="tab-panel" id="tabLive"><div class="loading-note">Carregando…</div></div>
@@ -777,6 +791,7 @@ async function carregarCardapio(){
   if(!data.ok){ el.innerHTML = `<div class="empty-note">${data.erro||'Não foi possível carregar o cardápio agora.'}</div>`; return; }
   cardapioCache.MENU = data.MENU || {};
   cardapioCache.CATS = data.CATS || [];
+  cardapioCache.PRODS = data.produtos || [];
   renderCardapioEdit();
 }
 function esc_(v){return String(v==null?'':v).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
@@ -853,6 +868,8 @@ function renderCardapioEdit(){
             `}
             <label class="toggle-ativo"><input type="checkbox" id="pf-${p.id}-ativo" ${p.ativo===false?'':'checked'}> Ativo</label>
             <button class="btn-salvar-prod" onclick="salvarProduto('${p.id}', ${tipoPizza}, this)">Salvar</button>
+            <button class="btn-edit-prod" onclick="abrirEditarProduto('${p.id}')">Editar tudo</button>
+            <button class="btn-excl-prod" onclick="excluirProduto('${p.id}', this)">Excluir</button>
           </div>
         `).join('')}
       </div>`;
@@ -932,6 +949,94 @@ async function salvarProduto(id, tipoPizza, btn){
   } else {
     alert(data.erro || 'Não foi possível salvar agora.');
   }
+}
+
+
+/* ---------- EDITAR TUDO / EXCLUIR PRODUTO ---------- */
+let prodEditandoId_ = null;
+function abrirEditarProduto(id){
+  const p = (cardapioCache.PRODS||[]).find(x=>String(x.id)===String(id));
+  if(!p){ alert('Produto não encontrado. Recarregue o cardápio.'); return; }
+  prodEditandoId_ = id;
+  const optsCat = cardapioCache.CATS.map(c=>`<option value="${esc_(c.id)}" ${c.id===p.categoriaId?'selected':''}>${esc_(c.label||c.id)}</option>`).join('');
+  document.getElementById('modalProdutoBox').innerHTML = `
+    <h3>Editar produto</h3>
+    <div style="font-size:0.72rem;opacity:.55;">id: ${esc_(p.id)}</div>
+    <label>Nome</label><input type="text" id="ep-nome" value="${esc_(p.nome)}">
+    <label>Categoria</label><select id="ep-cat" onchange="atualizarModalPrecos_()">${optsCat}</select>
+    <label>Descrição</label><textarea id="ep-desc" rows="3">${esc_(p.descricao)}</textarea>
+    <label>Ingredientes (separe por vírgula)</label><textarea id="ep-ing" rows="2">${esc_(p.ingredientesTexto)}</textarea>
+    <div class="linha2">
+      <div><label>Tempo de preparo</label><input type="text" id="ep-tempo" value="${esc_(p.tempoPreparo)}"></div>
+      <div><label>Ordem</label><input type="text" inputmode="numeric" id="ep-ordem" value="${esc_(p.ordem)}"></div>
+    </div>
+    <div id="ep-box-pizza" class="linha2">
+      <div><label>Broto (R$)</label><input type="text" inputmode="decimal" id="ep-broto" value="${p.precoBroto||''}"></div>
+      <div><label>Média (R$)</label><input type="text" inputmode="decimal" id="ep-media" value="${p.precoMedia||''}"></div>
+      <div><label>Grande (R$)</label><input type="text" inputmode="decimal" id="ep-grande" value="${p.precoGrande||''}"></div>
+      <div><label>Família (R$)</label><input type="text" inputmode="decimal" id="ep-familia" value="${p.precoFamilia||''}"></div>
+    </div>
+    <div id="ep-box-simples" class="linha2">
+      <div><label>Preço (R$)</label><input type="text" inputmode="decimal" id="ep-unico" value="${p.precoUnico||''}"></div>
+      <div><label>Tamanho / volume</label><input type="text" id="ep-volume" value="${esc_(p.volume)}" placeholder="Ex.: 300 g, 350 ml"></div>
+    </div>
+    <label>Imagem 1 (link)</label><input type="text" id="ep-img1" value="${esc_(p.imagemUrl)}">
+    <label>Imagem 2 (link)</label><input type="text" id="ep-img2" value="${esc_(p.imagemUrl2)}">
+    <label>Imagem 3 (link)</label><input type="text" id="ep-img3" value="${esc_(p.imagemUrl3)}">
+    <label style="display:flex;align-items:center;gap:6px;"><input type="checkbox" id="ep-ativo" ${p.ativo?'checked':''}> Ativo (aparece no cardápio)</label>
+    <div class="acoes">
+      <button class="btn-salvar-prod" onclick="salvarEdicaoCompleta(this)">Salvar</button>
+      <button style="background:#eee;" onclick="fecharEditarProduto()">Cancelar</button>
+    </div>
+    <button class="btn-excl-prod" style="width:100%;margin-top:10px;padding:11px;" onclick="excluirProduto('${esc_(p.id)}', this, true)">Excluir produto</button>`;
+  atualizarModalPrecos_();
+  document.getElementById('modalProduto').classList.add('aberto');
+}
+function fecharEditarProduto(){ document.getElementById('modalProduto').classList.remove('aberto'); prodEditandoId_=null; }
+function atualizarModalPrecos_(){
+  const cat = catPorId_(document.getElementById('ep-cat').value);
+  const pizza = cat && cat.tipo==='pizza';
+  document.getElementById('ep-box-pizza').style.display = pizza ? 'flex' : 'none';
+  document.getElementById('ep-box-simples').style.display = pizza ? 'none' : 'flex';
+}
+async function salvarEdicaoCompleta(btn){
+  const id = prodEditandoId_; if(!id) return;
+  const g = x=>document.getElementById(x).value;
+  const nome = g('ep-nome').trim();
+  if(!nome){ alert('O nome não pode ficar vazio.'); return; }
+  const catId = g('ep-cat'); const cat = catPorId_(catId);
+  const campos = {
+    nome, categoria_id: catId, descricao: g('ep-desc').trim(), ingredientes: g('ep-ing').trim(),
+    tempo_preparo: g('ep-tempo').trim(), ordem: precoNum_(g('ep-ordem')) || 0,
+    imagem_url: g('ep-img1').trim(), imagem_url_2: g('ep-img2').trim(), imagem_url_3: g('ep-img3').trim(),
+    ativo: document.getElementById('ep-ativo').checked
+  };
+  if(cat && cat.tipo==='pizza'){
+    campos.preco_broto = precoNum_(g('ep-broto')) || 0;
+    campos.preco_media = precoNum_(g('ep-media')) || 0;
+    campos.preco_grande = precoNum_(g('ep-grande')) || 0;
+    campos.preco_familia = precoNum_(g('ep-familia')) || 0;
+  } else {
+    campos.preco_unico = precoNum_(g('ep-unico')) || 0;
+    campos.volume = volumeFinal_(g('ep-volume'), cat && cat.unidade);
+  }
+  const restaurar = setBtnLoading_(btn, 'Salvando...');
+  const data = await apiPost('atualizarProduto', { id, campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível salvar agora.'); return; }
+  fecharEditarProduto();
+  await carregarCardapio();
+}
+async function excluirProduto(id, btn, doModal){
+  const p = (cardapioCache.PRODS||[]).find(x=>String(x.id)===String(id));
+  const nome = p ? p.nome : id;
+  if(!confirm(`Excluir "${nome}" de vez? Isso apaga a linha da planilha e não dá pra desfazer.\n\n(Se quiser só esconder do cardápio, desmarque "Ativo".)`)) return;
+  const restaurar = setBtnLoading_(btn, 'Excluindo...');
+  const data = await apiPost('excluirProduto', { id }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível excluir agora.'); return; }
+  if(doModal) fecharEditarProduto();
+  await carregarCardapio();
 }
 
 /* ---------- ABA CONFIGURAÇÕES ---------- */
