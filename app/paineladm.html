@@ -889,23 +889,24 @@ async function criarProduto(btn){
   const nome = document.getElementById('np-nome').value.trim();
   if(!cat){ alert('Escolha a categoria.'); return; }
   if(!nome){ alert('Digite o nome do produto.'); return; }
-  const produto = { id: slugId_(nome), categoria_id: catId, nome,
+  const campos = { categoria_id: catId, nome,
     descricao: document.getElementById('np-desc').value.trim(),
     ingredientes: document.getElementById('np-ing').value.trim(),
-    tempo_preparo: document.getElementById('np-tempo').value.trim(), ativo:'SIM' };
+    tempo_preparo: document.getElementById('np-tempo').value.trim(), ativo: true };
   if(cat.tipo==='pizza'){
-    produto.preco_broto = precoNum_(document.getElementById('np-broto').value);
-    produto.preco_media = precoNum_(document.getElementById('np-media').value);
-    produto.preco_grande = precoNum_(document.getElementById('np-grande').value);
-    produto.preco_familia = precoNum_(document.getElementById('np-familia').value);
-    if(produto.preco_grande===''){ alert('Informe pelo menos o preço do tamanho Grande.'); return; }
+    campos.preco_broto = precoNum_(document.getElementById('np-broto').value) || 0;
+    campos.preco_media = precoNum_(document.getElementById('np-media').value) || 0;
+    campos.preco_grande = precoNum_(document.getElementById('np-grande').value) || 0;
+    campos.preco_familia = precoNum_(document.getElementById('np-familia').value) || 0;
+    if(!campos.preco_grande){ alert('Informe pelo menos o preço do tamanho Grande.'); return; }
   } else {
-    produto.preco_unico = precoNum_(document.getElementById('np-preco').value);
-    if(produto.preco_unico===''){ alert('Informe o preço (ex.: 23,90).'); return; }
-    produto.volume = volumeFinal_(document.getElementById('np-volume').value, cat.unidade);
+    const pr = precoNum_(document.getElementById('np-preco').value);
+    if(pr===''){ alert('Informe o preço (ex.: 23,90).'); return; }
+    campos.preco_unico = pr;
+    campos.volume = volumeFinal_(document.getElementById('np-volume').value, cat.unidade);
   }
   const restaurar = setBtnLoading_(btn, 'Criando...');
-  const data = await apiPost('criarProduto', { produto }).catch(()=>({ok:false}));
+  const data = await apiPost('criarProduto', { campos }).catch(()=>({ok:false}));
   if(restaurar) restaurar();
   if(!data.ok){ alert(data.erro || 'Não foi possível criar o produto agora. (Atualize o Code.gs e gere nova implantação.)'); return; }
   await carregarCardapio();
