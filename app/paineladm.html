@@ -869,6 +869,7 @@ function renderCardapioEdit(){
             <label class="toggle-ativo"><input type="checkbox" id="pf-${p.id}-ativo" ${p.ativo===false?'':'checked'}> Ativo</label>
             <button class="btn-salvar-prod" onclick="salvarProduto('${p.id}', ${tipoPizza}, this)">Salvar</button>
             <button class="btn-edit-prod" onclick="abrirEditarProduto('${p.id}')">Editar tudo</button>
+            <button class="btn-edit-prod" style="background:#6b5d45;" onclick="duplicarProduto('${p.id}', this)">Duplicar</button>
             <button class="btn-excl-prod" onclick="excluirProduto('${p.id}', this)">Excluir</button>
           </div>
         `).join('')}
@@ -988,6 +989,7 @@ function abrirEditarProduto(id){
       <button class="btn-salvar-prod" onclick="salvarEdicaoCompleta(this)">Salvar</button>
       <button style="background:#eee;" onclick="fecharEditarProduto()">Cancelar</button>
     </div>
+    <button class="btn-edit-prod" style="width:100%;margin-top:10px;padding:11px;background:#6b5d45;" onclick="duplicarProduto('${esc_(p.id)}', this, true)">Duplicar produto</button>
     <button class="btn-excl-prod" style="width:100%;margin-top:10px;padding:11px;" onclick="excluirProduto('${esc_(p.id)}', this, true)">Excluir produto</button>`;
   atualizarModalPrecos_();
   document.getElementById('modalProduto').classList.add('aberto');
@@ -1026,6 +1028,25 @@ async function salvarEdicaoCompleta(btn){
   if(!data.ok){ alert(data.erro || 'Não foi possível salvar agora.'); return; }
   fecharEditarProduto();
   await carregarCardapio();
+}
+async function duplicarProduto(id, btn, doModal){
+  const p = (cardapioCache.PRODS||[]).find(x=>String(x.id)===String(id));
+  if(!p){ alert('Produto não encontrado. Recarregue o cardápio.'); return; }
+  const campos = {
+    nome: p.nome + ' (cópia)', categoria_id: p.categoriaId, descricao: p.descricao,
+    imagem_url: p.imagemUrl, imagem_url_2: p.imagemUrl2, imagem_url_3: p.imagemUrl3,
+    ingredientes: p.ingredientesTexto, tempo_preparo: p.tempoPreparo, volume: p.volume,
+    preco_broto: p.precoBroto, preco_media: p.precoMedia, preco_grande: p.precoGrande,
+    preco_familia: p.precoFamilia, preco_unico: p.precoUnico,
+    ativo: false // nasce escondido até você revisar e ativar
+  };
+  const restaurar = setBtnLoading_(btn, 'Duplicando...');
+  const data = await apiPost('criarProduto', { campos }).catch(()=>({ok:false}));
+  if(restaurar) restaurar();
+  if(!data.ok){ alert(data.erro || 'Não foi possível duplicar agora.'); return; }
+  if(doModal) fecharEditarProduto();
+  await carregarCardapio();
+  if(data.id) abrirEditarProduto(data.id); // já abre pra você ajustar nome/preço
 }
 async function excluirProduto(id, btn, doModal){
   const p = (cardapioCache.PRODS||[]).find(x=>String(x.id)===String(id));
